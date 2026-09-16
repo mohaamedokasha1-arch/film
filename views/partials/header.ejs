@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'CineArchive - Watch Free Legal Public Domain Classic Movies' %></title>
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'AKAVOX - Watch Free Legal Public Domain Classic Movies' %></title>
   <% if (typeof metaDescription !== 'undefined') { %>
     <meta name="description" content="<%= metaDescription %>">
   <% } %>
   <% if (typeof canonicalUrl !== 'undefined') { %>
     <link rel="canonical" href="<%= canonicalUrl %>">
   <% } %>
+  <meta name="application-name" content="<%= typeof siteSettings !== 'undefined' && siteSettings.site_name ? siteSettings.site_name : 'AKAVOX' %>">
+  <meta name="theme-color" content="#0b0e14">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="<%= typeof ogType !== 'undefined' ? ogType : 'website' %>">
-  <meta property="og:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : 'CineArchive' %>">
+  <meta property="og:site_name" content="<%= typeof siteSettings !== 'undefined' && siteSettings.site_name ? siteSettings.site_name : 'AKAVOX' %>">
+  <meta property="og:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : 'AKAVOX' %>">
   <% if (typeof metaDescription !== 'undefined') { %>
     <meta property="og:description" content="<%= metaDescription %>">
   <% } %>
@@ -24,7 +27,7 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : 'CineArchive' %>">
+  <meta name="twitter:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : 'AKAVOX' %>">
   <% if (typeof metaDescription !== 'undefined') { %>
     <meta name="twitter:description" content="<%= metaDescription %>">
   <% } %>
@@ -38,7 +41,9 @@
   <% } %>
 
   <link rel="stylesheet" href="/css/styles.css">
-  <link rel="icon" type="image/svg+xml" href="/images/placeholder-poster.svg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
   <header class="site-header">
@@ -47,7 +52,7 @@
         <div class="brand-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
         </div>
-        <span><%= typeof siteSettings !== 'undefined' && siteSettings.site_name ? siteSettings.site_name : 'CineArchive' %></span>
+        <span><%= typeof siteSettings !== 'undefined' && siteSettings.site_name ? siteSettings.site_name : 'AKAVOX' %></span>
         <span class="brand-badge">100% LEGAL</span>
       </a>
 

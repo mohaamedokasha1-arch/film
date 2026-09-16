@@ -29,7 +29,7 @@ class ArchiveFetcher {
         ...options,
         signal: controller.signal,
         headers: {
-          'User-Agent': 'CineArchive-LegalMovieCrawler/1.0 (+https://cinearchive.org; contact: legal@cinearchive.org)',
+          'User-Agent': 'Akavox-LegalMovieCrawler/1.0 (+https://akavox.org; contact: legal@akavox.org)',
           'Accept': 'application/json',
           ...(options.headers || {})
         }

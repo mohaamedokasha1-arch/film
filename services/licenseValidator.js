@@ -1,5 +1,5 @@
 /**
- * Strict License Validator for CineArchive
+ * Strict License Validator for AKAVOX
  * Ensures 100% legal compliance by enforcing Public Domain and Commercial-friendly Creative Commons licenses only.
  */
 

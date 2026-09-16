@@ -1,5 +1,5 @@
 /**
- * Automated Scheduler for CineArchive
+ * Automated Scheduler for AKAVOX
  * Periodically executes import jobs based on configurable intervals.
  */
 

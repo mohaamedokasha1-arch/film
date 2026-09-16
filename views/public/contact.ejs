@@ -58,21 +58,21 @@
         DMCA Notice & Takedown Policy
       </h2>
       <p>
-        CineArchive strictly adheres to the provisions of the Digital Millennium Copyright Act (17 U.S.C. § 512) and international intellectual property law. We only index films that our automated validator has verified as Public Domain or licensed under commercial-compatible Creative Commons terms.
+        <%= siteSettings.site_name %> strictly adheres to the provisions of the Digital Millennium Copyright Act (17 U.S.C. § 512) and international intellectual property law. We only index films that our automated validator has verified as Public Domain or licensed under commercial-compatible Creative Commons terms.
       </p>
       <p style="margin-top: 0.75rem;">
         If you are a copyright owner or authorized representative and believe that any work featured on this platform infringes your copyright, please furnish our Designated Agent with the following information:
       </p>
       <ol style="margin-left: 1.25rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem;">
         <li>Identification of the copyrighted work claimed to have been infringed.</li>
-        <li>Specific URL on CineArchive where the disputed content is displayed.</li>
+        <li>Specific URL on <%= siteSettings.site_name %> where the disputed content is displayed.</li>
         <li>Your contact information (name, address, telephone number, and email).</li>
         <li>A statement that you have a good faith belief that the disputed use is not authorized by the copyright owner, its agent, or the law.</li>
         <li>A statement made under penalty of perjury that the information in the notification is accurate and that you are authorized to act on behalf of the owner.</li>
       </ol>
       <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.85rem;">
         <strong>Designated Compliance Officer:</strong> <%= typeof siteSettings !== 'undefined' ? siteSettings.dmca_agent : 'Copyright Officer' %><br>
-        <strong>Email:</strong> <a href="mailto:<%= typeof siteSettings !== 'undefined' ? siteSettings.contact_email : 'legal@cinearchive.org' %>" style="color: var(--primary);"><%= typeof siteSettings !== 'undefined' ? siteSettings.contact_email : 'legal@cinearchive.org' %></a><br>
+        <strong>Email:</strong> <a href="mailto:<%= typeof siteSettings !== 'undefined' ? siteSettings.contact_email : 'legal@akavox.org' %>" style="color: var(--primary);"><%= typeof siteSettings !== 'undefined' ? siteSettings.contact_email : 'legal@akavox.org' %></a><br>
         <strong>SLA:</strong> Valid notices are processed and disputed items removed within 24 business hours.
       </div>
     </div>

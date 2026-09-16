@@ -1,5 +1,5 @@
 /**
- * Data Cleaner & Normalizer for CineArchive
+ * Data Cleaner & Normalizer for AKAVOX
  * Sanitizes and structures raw metadata from external sources.
  */
 

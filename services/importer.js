@@ -1,5 +1,5 @@
 /**
- * Automatic Movie Importer Engine for CineArchive
+ * Automatic Movie Importer Engine for AKAVOX
  * Orchestrates Fetching, License Validation, Cleaning, Deduplication, and Database Storage.
  */
 
