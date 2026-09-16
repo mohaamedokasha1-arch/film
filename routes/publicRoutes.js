@@ -76,7 +76,7 @@ router.get('/movie/:slug', async (req, res, next) => {
 
     if (!movie) {
       return res.status(404).render('public/search', {
-        pageTitle: 'Movie Not Found | CineArchive',
+        pageTitle: 'Movie Not Found | AKASHA HUB',
         metaDescription: 'The requested film could not be found.',
         canonicalUrl: '',
         searchQuery: slug.replace(/-/g, ' '),
@@ -360,7 +360,7 @@ router.get('/privacy-policy', (req, res) => {
   const baseUrl = `${req.protocol}://${req.get('host')}`;
   res.render('public/privacy', {
     pageTitle: `Privacy Policy | ${res.locals.siteSettings.site_name}`,
-    metaDescription: 'Privacy policy and advertising cookie disclosures for CineArchive.',
+    metaDescription: `Privacy policy and advertising cookie disclosures for ${res.locals.siteSettings.site_name}.`,
     canonicalUrl: `${baseUrl}/privacy-policy`,
     breadcrumbs: [{ name: 'Privacy Policy', url: '/privacy-policy' }],
     activeNav: ''
@@ -371,7 +371,7 @@ router.get('/terms-of-service', (req, res) => {
   const baseUrl = `${req.protocol}://${req.get('host')}`;
   res.render('public/terms', {
     pageTitle: `Terms of Service | ${res.locals.siteSettings.site_name}`,
-    metaDescription: 'Terms of service and public domain cultural heritage disclaimers for CineArchive.',
+    metaDescription: 'Terms of service and public domain cultural heritage disclaimers for AKASHA HUB.',
     canonicalUrl: `${baseUrl}/terms-of-service`,
     breadcrumbs: [{ name: 'Terms of Service', url: '/terms-of-service' }],
     activeNav: ''

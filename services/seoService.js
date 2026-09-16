@@ -1,5 +1,5 @@
 /**
- * SEO Generator & Sitemap Service for CineArchive
+ * SEO Generator & Sitemap Service for AKASHA HUB
  * Automates title, meta description, structured data, canonical URLs, and XML sitemaps.
  */
 
@@ -9,7 +9,7 @@ class SeoService {
   /**
    * Generates SEO Title for a movie
    */
-  static generateMovieTitle(movie, siteName = 'CineArchive') {
+  static generateMovieTitle(movie, siteName = 'AKASHA HUB') {
     const yearStr = movie.year ? ` (${movie.year})` : '';
     return `${movie.title}${yearStr} - Watch Free Classic Movie | ${siteName}`;
   }
@@ -17,7 +17,7 @@ class SeoService {
   /**
    * Generates Meta Description for a movie
    */
-  static generateMovieDescription(movie, siteName = 'CineArchive') {
+  static generateMovieDescription(movie, siteName = 'AKASHA HUB') {
     let genres = 'Classic';
     try {
       const gList = Array.isArray(movie.genres) ? movie.genres : JSON.parse(movie.genres || '[]');

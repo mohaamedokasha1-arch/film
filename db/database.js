@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 const defaultSettings = require('../config/defaultSettings');
 
-const DB_PATH = path.join(__dirname, 'cinearchive.db');
+const DB_PATH = path.join(__dirname, 'akashahub.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
 
 let dbInstance = null;
@@ -69,7 +69,7 @@ function exec(sql) {
 
 // Helper to hash passwords (SHA256 with salt)
 function hashPassword(password) {
-  const salt = 'cinearchive_salt_sec_2026';
+  const salt = 'akashahub_salt_sec_2026';
   return crypto.createHmac('sha256', salt).update(password).digest('hex');
 }
 

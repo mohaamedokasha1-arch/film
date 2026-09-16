@@ -1,4 +1,4 @@
-// CineArchive Admin Scripts
+// AKASHA HUB Admin Scripts
 document.addEventListener('DOMContentLoaded', () => {
   // Manual Import Trigger Button
   const runImportBtn = document.getElementById('btn-run-import');

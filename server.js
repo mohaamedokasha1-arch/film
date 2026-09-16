@@ -26,8 +26,8 @@ app.use(express.json({ limit: '10mb' }));
 
 // Session handling
 app.use(cookieSession({
-  name: 'cinearchive_session',
-  keys: [process.env.SESSION_SECRET || 'cinearchive_super_secret_key_2026'],
+  name: 'akashahub_session',
+  keys: [process.env.SESSION_SECRET || 'akashahub_super_secret_key_2026'],
   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 }));
 
@@ -43,7 +43,7 @@ app.use('/', publicRoutes);
 // 404 Handler
 app.use((req, res) => {
   res.status(404).render('public/search', {
-    pageTitle: 'Page Not Found (404) | CineArchive',
+    pageTitle: 'Page Not Found (404) | AKASHA HUB',
     metaDescription: 'The requested page could not be found.',
     canonicalUrl: '',
     searchQuery: '',
@@ -66,7 +66,7 @@ app.use((err, req, res, next) => {
   res.status(500).send(`
     <!DOCTYPE html>
     <html>
-      <head><title>System Notice - CineArchive</title><link rel="stylesheet" href="/css/styles.css"></head>
+      <head><title>System Notice - AKASHA HUB</title><link rel="stylesheet" href="/css/styles.css"></head>
       <body style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0b0e14;color:#fff;font-family:sans-serif;text-align:center;">
         <div>
           <h1 style="color:#f59e0b;font-size:2rem;margin-bottom:1rem;">Temporarily Processing Request</h1>
@@ -81,7 +81,7 @@ app.use((err, req, res, next) => {
 // Start Server & Ingestion Engine
 async function bootstrap() {
   try {
-    console.log('🚀 Initializing CineArchive System...');
+    console.log('🚀 Initializing AKASHA HUB System...');
     await initDb();
 
     // Check if initial seed is needed (if fewer than 8 movies in DB)
@@ -96,7 +96,7 @@ async function bootstrap() {
 
     app.listen(PORT, HOST, () => {
       console.log(`=======================================================`);
-      console.log(`🎬 CineArchive Platform is LIVE!`);
+      console.log(`🎬 AKASHA HUB Platform is LIVE!`);
       console.log(`🌐 Public Website : http://${HOST}:${PORT}`);
       console.log(`🔐 Admin Panel    : http://${HOST}:${PORT}/admin`);
       console.log(`🔑 Credentials    : admin / admin123`);
@@ -105,7 +105,7 @@ async function bootstrap() {
       console.log(`=======================================================`);
     });
   } catch (err) {
-    console.error('❌ Failed to start CineArchive server:', err);
+    console.error('❌ Failed to start AKASHA HUB server:', err);
     process.exit(1);
   }
 }

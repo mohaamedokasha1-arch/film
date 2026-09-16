@@ -1,4 +1,4 @@
-// Public CineArchive Main Scripts
+// Public AKASHA HUB Main Scripts
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Copy Attribution Button
   const copyBtn = document.getElementById('copy-attribution-btn');

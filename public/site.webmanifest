@@ -1,0 +1,18 @@
+{
+  "name": "AKASHA HUB",
+  "short_name": "AKASHA",
+  "description": "AKASHA HUB — Timeless Public Domain & Legal Classic Cinema. Stream verified legal classic movies, free forever.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b0e14",
+  "theme_color": "#0b0e14",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
--- CineArchive Database Schema
+-- AKASHA HUB Database Schema
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS movies (

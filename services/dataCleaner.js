@@ -1,5 +1,5 @@
 /**
- * Data Cleaner & Normalizer for CineArchive
+ * Data Cleaner & Normalizer for AKASHA HUB
  * Sanitizes and structures raw metadata from external sources.
  */
 

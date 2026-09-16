@@ -1,5 +1,5 @@
 /**
- * Automatic Movie Importer Engine for CineArchive
+ * Automatic Movie Importer Engine for AKASHA HUB
  * Orchestrates Fetching, License Validation, Cleaning, Deduplication, and Database Storage.
  */
 

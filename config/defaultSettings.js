@@ -1,11 +1,12 @@
-// Default settings for CineArchive
+// Default settings for AKASHA HUB (أكاشا هاب)
+// Official brand name (EN): AKASHA HUB | Brand name (AR): أكاشا هاب
 module.exports = [
-  { key: 'site_name', value: 'CineArchive', type: 'string' },
+  { key: 'site_name', value: 'AKASHA HUB', type: 'string' },
   { key: 'site_tagline', value: 'Timeless Public Domain & Legal Classic Cinema', type: 'string' },
   { key: 'site_description', value: 'Stream thousands of verified legal, public domain, and Creative Commons classic movies, silent masterworks, film noir, vintage comedies, and historical treasures. 100% free and open culture.', type: 'string' },
   { key: 'site_url', value: 'http://localhost:3000', type: 'string' },
-  { key: 'contact_email', value: 'legal@cinearchive.org', type: 'string' },
-  { key: 'dmca_agent', value: 'Copyright & Compliance Officer, CineArchive Open Cultural Project', type: 'string' },
+  { key: 'contact_email', value: 'legal@akashahub.org', type: 'string' },
+  { key: 'dmca_agent', value: 'Copyright & Compliance Officer, AKASHA HUB Open Cultural Project', type: 'string' },
   { key: 'items_per_page', value: '12', type: 'int' },
   { key: 'auto_publish', value: 'true', type: 'boolean' },
   { key: 'scheduler_enabled', value: 'true', type: 'boolean' },
