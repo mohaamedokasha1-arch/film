@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Activity | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'activity' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Activity logs' }) %>
+      <main class="admin-content">
+        <form method="GET" style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+          <input class="form-input" name="q" value="<%= searchQuery %>" placeholder="Search logs" style="max-width:280px;">
+          <button class="btn btn-secondary">Search</button>
+        </form>
+        <form method="POST" action="/admin/activity/clear" onsubmit="return confirm('Clear all activity logs?');" style="margin-bottom:1rem;">
+          <button class="btn btn-secondary btn-sm" style="color:var(--accent-rose);">Clear logs</button>
+        </form>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>When</th><th>User</th><th>Action</th><th>Entity</th><th>Details</th><th>IP</th></tr></thead>
+            <tbody>
+              <% logs.forEach(l => { %>
+                <tr>
+                  <td><%= l.created_at %></td>
+                  <td><%= l.username %></td>
+                  <td><%= l.action %></td>
+                  <td><%= l.entity_type %> <%= l.entity_id || '' %></td>
+                  <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;"><%= l.details %></td>
+                  <td><%= l.ip_address || '' %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <% if (totalPages > 1) { %>
+          <nav class="pagination">
+            <% for (let p = 1; p <= totalPages; p++) { %>
+              <a class="page-btn <%= p === currentPage ? 'active' : '' %>" href="/admin/activity?page=<%= p %>&q=<%= encodeURIComponent(searchQuery) %>"><%= p %></a>
+            <% } %>
+          </nav>
+        <% } %>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

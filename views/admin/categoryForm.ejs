@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= genre && genre.id ? 'Edit category' : 'Add category' %> | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'categories' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: genre && genre.id ? 'Edit category' : 'Add category' }) %>
+      <main class="admin-content" style="max-width:720px;">
+        <% if (formError) { %><p style="color:#f87171;"><%= formError %></p><% } %>
+        <form method="POST" action="<%= genre && genre.id ? '/admin/categories/' + genre.id + '/edit' : '/admin/categories/new' %>" style="background:var(--bg-surface);padding:1.5rem;border-radius:10px;border:1px solid var(--border-color);">
+          <div class="form-group"><label class="form-label">Name (EN) *</label><input class="form-input" name="name" required value="<%= genre ? (genre.name||'') : '' %>"></div>
+          <div class="form-group"><label class="form-label">Name (AR)</label><input class="form-input" name="name_ar" value="<%= genre && genre.name_ar ? genre.name_ar : '' %>"></div>
+          <div class="form-group"><label class="form-label">Slug</label><input class="form-input" name="slug" value="<%= genre ? (genre.slug||'') : '' %>"></div>
+          <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" name="description"><%= genre && genre.description ? genre.description : '' %></textarea></div>
+          <div class="form-group"><label class="form-label">Image URL</label><input class="form-input" name="image_url" value="<%= genre && genre.image_url ? genre.image_url : '' %>"></div>
+          <div class="form-group"><label class="form-label">Parent</label>
+            <select class="form-select" name="parent_id">
+              <option value="">None</option>
+              <% (parents||[]).forEach(p => { %>
+                <option value="<%= p.id %>" <%= genre && genre.parent_id == p.id ? 'selected' : '' %>><%= p.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Sort</label><input class="form-input" type="number" name="sort_order" value="<%= genre && genre.sort_order != null ? genre.sort_order : 0 %>"></div>
+          <div class="form-group"><label class="form-label">Color</label><input class="form-input" name="color" value="<%= genre && genre.color ? genre.color : '' %>"></div>
+          <label><input type="checkbox" name="visible" <%= !genre || genre.visible !== 0 ? 'checked' : '' %>> Visible</label>
+          <label style="margin-left:1rem;"><input type="checkbox" name="show_in_nav" <%= !genre || genre.show_in_nav !== 0 ? 'checked' : '' %>> In nav</label>
+          <label style="margin-left:1rem;"><input type="checkbox" name="show_on_home" <%= !genre || genre.show_on_home !== 0 ? 'checked' : '' %>> On homepage</label>
+          <div style="margin-top:1.25rem;display:flex;gap:0.75rem;">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a class="btn btn-secondary" href="/admin/categories">Cancel</a>
+          </div>
+        </form>
+        <% if (typeof movies !== 'undefined' && movies) { %>
+          <h3 style="margin-top:2rem;">Movies in this category (<%= movies.length %>)</h3>
+          <ul style="margin-top:0.75rem;color:var(--text-muted);">
+            <% movies.forEach(m => { %><li><a href="/admin/movies/<%= m.id %>/edit" style="color:var(--primary);"><%= m.title %></a> (<%= m.year %>)</li><% }) %>
+          </ul>
+        <% } %>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

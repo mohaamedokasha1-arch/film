@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= movie ? 'Edit Movie' : 'Add Movie' %> | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'movies' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: movie ? ('Edit: ' + movie.title) : 'Add Movie' }) %>
+      <main class="admin-content" style="max-width: 980px;">
+        <% if (formError) { %>
+          <div style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.35);padding:0.75rem 1rem;border-radius:8px;color:#f87171;margin-bottom:1rem;"><%= formError %></div>
+        <% } %>
+        <div style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:2rem;">
+          <form action="<%= movie ? '/admin/movies/' + movie.id + '/edit' : '/admin/movies/new' %>" method="POST">
+            <h3 style="margin-bottom:1rem;">Basic</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group"><label class="form-label">Title (EN) *</label><input class="form-input" name="title" required minlength="2" value="<%= movie ? movie.title : '' %>"></div>
+              <div class="form-group"><label class="form-label">Title (AR)</label><input class="form-input" name="title_ar" value="<%= movie && movie.title_ar ? movie.title_ar : '' %>"></div>
+              <div class="form-group"><label class="form-label">Original title</label><input class="form-input" name="original_title" value="<%= movie && movie.original_title ? movie.original_title : '' %>"></div>
+              <div class="form-group"><label class="form-label">Slug</label><input class="form-input" name="slug" value="<%= movie ? movie.slug : '' %>"></div>
+              <div class="form-group"><label class="form-label">Year *</label><input class="form-input" type="number" name="year" min="1880" max="<%= new Date().getFullYear() %>" value="<%= movie ? movie.year : '' %>"></div>
+              <div class="form-group"><label class="form-label">Duration (min)</label><input class="form-input" type="number" name="duration" value="<%= movie ? movie.duration : '' %>"></div>
+              <div class="form-group"><label class="form-label">Country</label><input class="form-input" name="country" value="<%= movie && movie.country ? movie.country : '' %>"></div>
+              <div class="form-group"><label class="form-label">Language</label><input class="form-input" name="language" value="<%= movie && movie.language ? movie.language : 'English' %>"></div>
+              <div class="form-group"><label class="form-label">Age rating</label>
+                <select class="form-select" name="age_rating">
+                  <% ['','G','PG','PG-13','R','NC-17'].forEach(a => { %>
+                    <option value="<%= a %>" <%= movie && movie.age_rating === a ? 'selected' : '' %>><%= a || '—' %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Rating 0–10</label><input class="form-input" type="number" step="0.1" min="0" max="10" name="rating" value="<%= movie && movie.rating != null ? movie.rating : '' %>"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" name="description" style="min-height:120px;"><%= movie ? (movie.description||'') : '' %></textarea></div>
+
+            <h3 style="margin:1.25rem 0 0.75rem;">Crew</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group"><label class="form-label">Director</label><input class="form-input" name="director" value="<%= movie ? (movie.director||'') : '' %>"></div>
+              <div class="form-group"><label class="form-label">Writer</label><input class="form-input" name="writer" value="<%= movie && movie.writer ? movie.writer : '' %>"></div>
+              <div class="form-group"><label class="form-label">Studio</label><input class="form-input" name="studio" value="<%= movie && movie.studio ? movie.studio : '' %>"></div>
+              <div class="form-group"><label class="form-label">Cast (comma separated)</label>
+                <input class="form-input" name="cast_members" value="<% if (movie && movie.cast_members) { try { %><%= (Array.isArray(movie.cast_members)?movie.cast_members:JSON.parse(movie.cast_members||'[]')).join(', ') %><% } catch(e) { %><%= movie.cast_members %><% } } %>">
+              </div>
+            </div>
+
+            <h3 style="margin:1.25rem 0 0.75rem;">Media & playback</h3>
+            <div class="form-group"><label class="form-label">Poster URL *</label><input class="form-input" name="poster_url" value="<%= movie ? (movie.poster_url||'') : '' %>"></div>
+            <div class="form-group"><label class="form-label">Cover URL</label><input class="form-input" name="cover_url" value="<%= movie && movie.cover_url ? movie.cover_url : '' %>"></div>
+            <div class="form-group"><label class="form-label">Trailer URL</label><input class="form-input" name="trailer_url" value="<%= movie && movie.trailer_url ? movie.trailer_url : '' %>"></div>
+            <div class="form-group"><label class="form-label">Watch / video URL</label><input class="form-input" name="video_url" value="<%= movie ? (movie.video_url||'') : '' %>"></div>
+            <div class="form-group"><label class="form-label">Embed URL</label><input class="form-input" name="embed_url" value="<%= movie ? (movie.embed_url||'') : '' %>"></div>
+            <div class="form-group"><label class="form-label">Source URL</label><input class="form-input" name="source_url" value="<%= movie ? (movie.source_url||'') : '' %>"></div>
+
+            <h3 style="margin:1.25rem 0 0.75rem;">Classification</h3>
+            <div class="form-group"><label class="form-label">Genres (comma separated)</label>
+              <input class="form-input" name="genres" list="genre-list" value="<% if (movie && movie.genres) { try { %><%= (Array.isArray(movie.genres)?movie.genres:JSON.parse(movie.genres||'[]')).join(', ') %><% } catch(e) { %><%= movie.genres %><% } } %>">
+              <datalist id="genre-list"><% genres.forEach(g => { %><option value="<%= g.name %>"><% }) %></datalist>
+            </div>
+            <div class="form-group"><label class="form-label">Tags (comma separated)</label>
+              <input class="form-input" name="tags" value="<% if (movie && movie.tags) { try { %><%= (Array.isArray(movie.tags)?movie.tags:JSON.parse(movie.tags||'[]')).join(', ') %><% } catch(e) { %><%= movie.tags %><% } } %>">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+              <div class="form-group"><label class="form-label">Type</label>
+                <select class="form-select" name="content_type">
+                  <% ['movie','series','anime','documentary'].forEach(t => { %>
+                    <option value="<%= t %>" <%= movie && movie.content_type === t ? 'selected' : '' %>><%= t %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                  <% ['published','draft','private'].forEach(s => { %>
+                    <option value="<%= s %>" <%= movie && movie.status === s ? 'selected' : '' %>><%= s %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">License</label><input class="form-input" name="license_type" value="<%= movie ? movie.license_type : 'Public Domain' %>"></div>
+            </div>
+            <div class="form-group"><label class="form-label">License URL</label><input class="form-input" name="license_url" value="<%= movie ? (movie.license_url||'') : '' %>"></div>
+            <div class="form-group"><label class="form-label">Attribution</label><input class="form-input" name="attribution_text" value="<%= movie ? (movie.attribution_text||'') : '' %>"></div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:1rem;margin:1rem 0;">
+              <label><input type="checkbox" name="featured" <%= movie && movie.featured ? 'checked' : '' %>> Featured</label>
+              <label><input type="checkbox" name="trending" <%= movie && movie.trending ? 'checked' : '' %>> Trending</label>
+              <label><input type="checkbox" name="popular" <%= movie && movie.popular ? 'checked' : '' %>> Popular</label>
+              <label><input type="checkbox" name="is_new" <%= movie && movie.is_new ? 'checked' : '' %>> New</label>
+              <label><input type="checkbox" name="coming_soon" <%= movie && movie.coming_soon ? 'checked' : '' %>> Coming soon</label>
+              <label><input type="checkbox" name="comments_enabled" <%= !movie || movie.comments_enabled ? 'checked' : '' %>> Comments</label>
+            </div>
+            <div class="form-group"><label class="form-label">Sort order</label><input class="form-input" type="number" name="sort_order" value="<%= movie && movie.sort_order ? movie.sort_order : 0 %>"></div>
+
+            <h3 style="margin:1.25rem 0 0.75rem;">SEO</h3>
+            <div class="form-group"><label class="form-label">Meta title</label><input class="form-input" name="meta_title" value="<%= movie && movie.meta_title ? movie.meta_title : '' %>"></div>
+            <div class="form-group"><label class="form-label">Meta description</label><textarea class="form-textarea" name="meta_description"><%= movie && movie.meta_description ? movie.meta_description : '' %></textarea></div>
+            <div class="form-group"><label class="form-label">Meta keywords</label><input class="form-input" name="meta_keywords" value="<%= movie && movie.meta_keywords ? movie.meta_keywords : '' %>"></div>
+
+            <div style="display:flex;gap:1rem;margin-top:1.5rem;">
+              <button class="btn btn-primary" type="submit"><%= movie ? 'Save changes' : 'Create movie' %></button>
+              <a class="btn btn-secondary" href="/admin/movies">Cancel</a>
+              <% if (movie) { %><a class="btn btn-secondary" href="/movie/<%= movie.slug %>" target="_blank">View on site</a><% } %>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

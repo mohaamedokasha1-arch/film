@@ -139,6 +139,42 @@ async function main() {
     const r = checker.check(mk({}));
     assert(!r.accepted && /No license information/i.test(r.reason), JSON.stringify(r));
   });
+
+  const LocLicenseChecker = require('../movie_sources/loc_national_screening_room/LocLicenseChecker');
+  const locChecker = new LocLicenseChecker({ publicDomainCutoffYear: 1929 });
+  await ok('LOC ACCEPT: U.S. Edison paper print 1897 (pre-cutoff)', async () => {
+    const r = locChecker.check({
+      title: 'Buffalo Fire Department in action',
+      year: 1897,
+      country: 'United States',
+      source_url: 'https://www.loc.gov/item/00694159/',
+      license: { accessRestricted: false, rightsText: 'Paper Print Collection Edison Manufacturing', contributors: 'thomas a. edison, inc', notes: '' }
+    });
+    assert(r.accepted && r.canRehost === false && r.commercialAllowed, JSON.stringify(r));
+  });
+  await ok('LOC ACCEPT: USDA government work even if year is 1939', async () => {
+    const r = locChecker.check({
+      title: 'Cicada',
+      year: 1939,
+      source_url: 'https://www.loc.gov/item/2021604034/',
+      license: { accessRestricted: false, rightsText: '', contributors: 'united states. department of agriculture. motion picture service', notes: '' }
+    });
+    assert(r.accepted && /Government Work/i.test(r.licenseType), JSON.stringify(r));
+  });
+  await ok('LOC REJECT: 1954 commercial copyright collection without PD statement', async () => {
+    const r = locChecker.check({
+      title: 'American scrapbook',
+      year: 1954,
+      source_url: 'https://www.loc.gov/item/2011600300/',
+      license: { accessRestricted: false, rightsText: 'copyright collection (library of congress)', contributors: 'general electric company', notes: 'copyright deposit' }
+    });
+    assert(!r.accepted, JSON.stringify(r));
+  });
+  await ok('LOC REJECT: access_restricted', async () => {
+    const r = locChecker.check({ title: 'X', year: 1910, license: { accessRestricted: true, rightsText: 'public domain' } });
+    assert(!r.accepted && /access-restricted/i.test(r.reason), JSON.stringify(r));
+  });
+
   await ok('REJECT: admins can disable a license class (CC BY-SA off)', async () => {
     const strict = new WikimediaLicenseChecker({ allowCcBySa: false });
     const r = strict.check(mk({ shortName: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0', copyrightedFlag: 'true' }));
@@ -286,8 +322,10 @@ async function main() {
     const list = await registry.listAll();
     const legacy = list.find(s => s.sourceType === 'legacy');
     const commons = list.find(s => s.key === 'wikimedia_commons');
+    const loc = list.find(s => s.key === 'loc_national_screening_room');
     assert(legacy && legacy.modifiable === false, 'legacy must be read-only');
     assert(commons && commons.modifiable === true);
+    assert(loc && loc.modifiable === true, 'LOC source must be registered');
     assert(commons.totalImported >= 8, `commons count ${commons.totalImported}`);
   });
 

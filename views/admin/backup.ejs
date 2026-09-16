@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Backup | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'backup' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Backup & export' }) %>
+      <main class="admin-content" style="max-width:720px;">
+        <p style="color:var(--text-muted);margin-bottom:1.25rem;">Movies in database: <strong style="color:#fff;"><%= movieCount %></strong>. Exports use live SQLite data.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+          <a class="btn btn-primary" href="/admin/backup/export/all">Export all JSON</a>
+          <a class="btn btn-secondary" href="/admin/backup/export/movies">Export movies JSON</a>
+          <a class="btn btn-secondary" href="/admin/backup/export/categories">Export categories JSON</a>
+          <a class="btn btn-secondary" href="/admin/backup/export/settings">Export settings JSON</a>
+          <a class="btn btn-secondary" href="/admin/backup/database">Download SQLite file</a>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

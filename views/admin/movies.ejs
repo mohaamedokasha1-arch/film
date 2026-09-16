@@ -15,6 +15,10 @@
 
       <main class="admin-content">
         <!-- Search and Filter Bar -->
+        <div style="display:flex;justify-content:flex-end;gap:0.5rem;margin-bottom:1rem;">
+          <a href="/admin/movies/new" class="btn btn-primary btn-sm">+ Add movie</a>
+          <a href="/admin/movies/trash" class="btn btn-secondary btn-sm">Trash (<%= counts.trash || 0 %>)</a>
+        </div>
         <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
           <form action="/admin/movies" method="GET" style="display: flex; gap: 0.75rem; flex: 1; max-width: 500px;">
             <input type="text" name="q" value="<%= searchQuery %>" placeholder="Search by title, director, external ID..." class="form-input" style="padding: 0.5rem 0.85rem;">
@@ -34,10 +38,23 @@
         </div>
 
         <!-- Movies Table -->
+        <form method="POST" action="/admin/movies/bulk">
+        <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;align-items:center;">
+          <select name="bulk_action" class="form-select" style="max-width:180px;">
+            <option value="">Bulk action</option>
+            <option value="publish">Publish</option>
+            <option value="draft">Unpublish</option>
+            <option value="feature">Mark featured</option>
+            <option value="delete">Move to trash</option>
+            <option value="export">Export JSON</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" type="submit">Apply</button>
+        </div>
         <div class="table-wrap">
           <table class="admin-table">
             <thead>
               <tr>
+                <th></th>
                 <th style="width: 60px;">Poster</th>
                 <th>Title & Year</th>
                 <th>Source ID</th>
@@ -50,13 +67,14 @@
             <tbody>
               <% if (movies.length === 0) { %>
                 <tr>
-                  <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                  <td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-muted);">
                     No movies match the selected filters.
                   </td>
                 </tr>
               <% } %>
               <% movies.forEach(movie => { %>
                 <tr>
+                  <td><input type="checkbox" name="ids" value="<%= movie.id %>"></td>
                   <td>
                     <img src="<%= movie.poster_url || '/images/placeholder-poster.svg' %>" alt="" style="width: 42px; height: 56px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
                   </td>
@@ -97,7 +115,7 @@
                           <%= movie.status === 'published' ? 'Unpublish' : 'Publish' %>
                         </button>
                       </form>
-                      <form action="/admin/movies/<%= movie.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to permanently delete this movie record?');">
+                      <form action="/admin/movies/<%= movie.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Move this movie to trash?');">
                         <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--accent-rose);" title="Delete">
                           Delete
                         </button>

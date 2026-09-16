@@ -25,3 +25,30 @@
     </div>
   </div>
 </header>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var t = params.get('t') || sessionStorage.getItem('akavox_t');
+  if (params.get('t')) sessionStorage.setItem('akavox_t', params.get('t'));
+  if (!t) return;
+  document.querySelectorAll('a[href]').forEach(function (a) {
+    try {
+      var u = new URL(a.getAttribute('href'), location.origin);
+      if (u.origin !== location.origin) return;
+      if (u.pathname.indexOf('/admin') !== 0) return;
+      if (!u.searchParams.get('t')) {
+        u.searchParams.set('t', t);
+        a.setAttribute('href', u.pathname + u.search + u.hash);
+      }
+    } catch (e) {}
+  });
+  document.querySelectorAll('form').forEach(function (f) {
+    if (f.querySelector('input[name="t"]')) return;
+    var i = document.createElement('input');
+    i.type = 'hidden';
+    i.name = 't';
+    i.value = t;
+    f.appendChild(i);
+  });
+})();
+</script>

@@ -1,0 +1,11 @@
+<%- include('../partials/header') %>
+
+<div class="container" style="padding: 3rem 1.25rem 5rem; max-width: 860px;">
+  <%- include('../partials/breadcrumbs', { breadcrumbs }) %>
+  <h1 style="font-size: 2.25rem; margin-bottom: 1.25rem; color: #ffffff;"><%= cms.title %></h1>
+  <div style="color: #d1d5db; line-height: 1.8;" class="cms-body">
+    <%- cms.content %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

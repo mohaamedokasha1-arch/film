@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Analytics | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'analytics' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Analytics' }) %>
+      <main class="admin-content">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Movies missing posters</div>
+            <div class="kpi-value"><%= missingPoster %></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+          <div style="background:var(--bg-surface);padding:1.25rem;border-radius:10px;border:1px solid var(--border-color);">
+            <h3 style="margin-bottom:0.75rem;">Top views</h3>
+            <ol style="padding-left:1.25rem;">
+              <% topMovies.forEach(m => { %><li style="margin-bottom:0.35rem;"><a href="/movie/<%= m.slug %>" style="color:var(--primary);"><%= m.title %></a> — <%= m.view_count || 0 %></li><% }) %>
+            </ol>
+          </div>
+          <div style="background:var(--bg-surface);padding:1.25rem;border-radius:10px;border:1px solid var(--border-color);">
+            <h3 style="margin-bottom:0.75rem;">By genre</h3>
+            <% byGenre.forEach(g => { %>
+              <div style="display:flex;justify-content:space-between;margin-bottom:0.35rem;"><span><%= g.name %></span><span><%= g.movie_count %></span></div>
+            <% }) %>
+          </div>
+        </div>
+        <h3 style="margin:1.5rem 0 0.75rem;">Recent additions</h3>
+        <ul><% recentMovies.forEach(m => { %><li><%= m.title %> — <%= m.status %> — <%= m.created_at %></li><% }) %></ul>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

@@ -63,7 +63,15 @@ router.post('/:key/configure', requireAdmin, async (req, res, next) => {
       await setSetting('commons_rate_delay_ms', parseInt(req.body.commons_rate_delay_ms, 10) || 500, 'int');
       await setSetting('source_import_frequency_hours', parseInt(req.body.source_import_frequency_hours, 10) || 6, 'int');
       await setSetting('source_scheduler_enabled', req.body.source_scheduler_enabled === 'true', 'boolean');
-      await sourceScheduler.start(); // reconfigure timer without touching legacy scheduler
+      await sourceScheduler.start();
+    } else if (req.params.key === 'loc_national_screening_room') {
+      await setSetting('loc_collections', req.body.loc_collections || 'national-screening-room', 'string');
+      await setSetting('loc_batch_size', parseInt(req.body.loc_batch_size, 10) || 8, 'int');
+      await setSetting('loc_min_duration_seconds', parseInt(req.body.loc_min_duration_seconds, 10) || 20, 'int');
+      await setSetting('loc_rate_delay_ms', parseInt(req.body.loc_rate_delay_ms, 10) || 700, 'int');
+      await setSetting('source_import_frequency_hours', parseInt(req.body.source_import_frequency_hours, 10) || 6, 'int');
+      await setSetting('source_scheduler_enabled', req.body.source_scheduler_enabled === 'true', 'boolean');
+      await sourceScheduler.start();
     }
     res.redirect(`/admin/movie-sources/${req.params.key}/configure?saved=1`);
   } catch (err) { next(err); }

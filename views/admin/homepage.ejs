@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Homepage | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'homepage' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Homepage management' }) %>
+      <main class="admin-content">
+        <% if (successMessage) { %><p style="color:#34d399;"><%= successMessage %></p><% } %>
+        <form method="POST" action="/admin/homepage/settings" style="background:var(--bg-surface);padding:1.25rem;border-radius:10px;border:1px solid var(--border-color);margin-bottom:1.5rem;max-width:640px;">
+          <h3 style="margin-bottom:0.75rem;">Hero</h3>
+          <div class="form-group">
+            <label class="form-label">Hero mode</label>
+            <select class="form-select" name="homepage_hero_mode">
+              <option value="featured" <%= siteSettings.homepage_hero_mode === 'featured' ? 'selected' : '' %>>Single featured movie</option>
+              <option value="latest" <%= siteSettings.homepage_hero_mode === 'latest' ? 'selected' : '' %>>Latest published</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm">Save hero</button>
+        </form>
+
+        <h3 style="margin-bottom:0.75rem;">Sections</h3>
+        <% sections.forEach(s => { %>
+          <form method="POST" action="/admin/homepage/sections/<%= s.id %>" style="background:var(--bg-surface);padding:1.25rem;border-radius:10px;border:1px solid var(--border-color);margin-bottom:1rem;">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0.75rem;">
+              <div class="form-group"><label class="form-label">Title</label><input class="form-input" name="title" value="<%= s.title %>"></div>
+              <div class="form-group"><label class="form-label">Sort</label><input class="form-input" type="number" name="sort_order" value="<%= s.sort_order %>"></div>
+              <div class="form-group"><label class="form-label">Limit</label><input class="form-input" type="number" name="item_limit" value="<%= s.item_limit %>"></div>
+              <div class="form-group"><label class="form-label">Layout</label>
+                <select class="form-select" name="layout">
+                  <option value="grid" <%= s.layout === 'grid' ? 'selected' : '' %>>Grid</option>
+                  <option value="list" <%= s.layout === 'list' ? 'selected' : '' %>>List</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;">
+              <div class="form-group"><label class="form-label">Source</label>
+                <select class="form-select" name="source_mode">
+                  <option value="auto" <%= s.source_mode === 'auto' ? 'selected' : '' %>>Auto</option>
+                  <option value="manual" <%= s.source_mode === 'manual' ? 'selected' : '' %>>Manual IDs</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Auto flag</label>
+                <select class="form-select" name="filter_flag">
+                  <% ['latest','featured','trending','popular','views'].forEach(f => { %>
+                    <option value="<%= f %>" <%= s.filter_flag === f ? 'selected' : '' %>><%= f %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Genre filter</label><input class="form-input" name="filter_genre" value="<%= s.filter_genre || '' %>"></div>
+            </div>
+            <label><input type="checkbox" name="enabled" <%= s.enabled ? 'checked' : '' %>> Enabled</label>
+            <div style="margin-top:0.75rem;display:flex;gap:0.5rem;">
+              <button class="btn btn-primary btn-sm" type="submit">Save section</button>
+            </div>
+          </form>
+          <form method="POST" action="/admin/homepage/sections/<%= s.id %>/delete" onsubmit="return confirm('Delete section?');" style="margin:-0.5rem 0 1.25rem;">
+            <button class="btn btn-secondary btn-sm" style="color:var(--accent-rose);">Delete</button>
+          </form>
+        <% }) %>
+
+        <form method="POST" action="/admin/homepage/sections" style="background:var(--bg-surface);padding:1.25rem;border-radius:10px;border:1px solid var(--border-color);max-width:640px;">
+          <h3 style="margin-bottom:0.75rem;">New section</h3>
+          <div class="form-group"><label class="form-label">Title</label><input class="form-input" name="title" required></div>
+          <input type="hidden" name="enabled" value="on">
+          <button class="btn btn-primary">Create section</button>
+        </form>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

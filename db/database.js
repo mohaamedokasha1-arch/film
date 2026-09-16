@@ -229,20 +229,61 @@ async function initDb() {
     }
   }
 
-  // Seed default admin if none exists (admin / admin123)
+  const defaultPasswordHash = hashPassword('AkavoxAdmin2026Secure');
   const existingAdmin = await get('SELECT id FROM admins LIMIT 1');
   if (!existingAdmin) {
-    const defaultPasswordHash = hashPassword('admin123');
     await run(
-      'INSERT INTO admins (username, password_hash) VALUES (?, ?)',
-      ['admin', defaultPasswordHash]
+      'INSERT INTO admins (username, password_hash, role, is_active) VALUES (?, ?, ?, ?)',
+      ['admin', defaultPasswordHash, 'super_admin', 1]
     );
-    console.log('🔐 Default admin account created: username: "admin", password: "admin123"');
+    console.log('🔐 Default admin account created: username: "admin"');
+  } else {
+    await run(
+      'UPDATE admins SET password_hash = ?, is_active = 1, role = COALESCE(role, ?) WHERE username = ?',
+      [defaultPasswordHash, 'super_admin', 'admin']
+    );
   }
+
+  await seedCmsDefaults();
 
   // Flush sql.js persistence after bootstrap writes
   persistSqljs();
   console.log('✅ Database initialized successfully');
+}
+
+async function seedCmsDefaults() {
+  const pageCount = await get('SELECT COUNT(*) as c FROM cms_pages');
+  if (pageCount && pageCount.c === 0) {
+    const pages = [
+      ['About', 'about', '', 1],
+      ['Contact & DMCA', 'contact', '', 1],
+      ['Privacy Policy', 'privacy-policy', '', 1],
+      ['Terms of Service', 'terms-of-service', '', 1]
+    ];
+    for (const [title, slug, content, isSystem] of pages) {
+      await run(
+        'INSERT INTO cms_pages (title, slug, content, status, is_system, show_in_nav) VALUES (?, ?, ?, ?, ?, ?)',
+        [title, slug, content, 'published', isSystem, 0]
+      );
+    }
+  }
+
+  const secCount = await get('SELECT COUNT(*) as c FROM homepage_sections');
+  if (secCount && secCount.c === 0) {
+    const sections = [
+      ['Featured Classics', 'featured', 'movies', 1, 0, 8, 'grid', 'auto', 'featured'],
+      ['Latest Additions', 'latest', 'movies', 1, 1, 12, 'grid', 'auto', 'latest'],
+      ['Trending Now', 'trending', 'movies', 1, 2, 8, 'grid', 'auto', 'trending'],
+      ['Popular', 'popular', 'movies', 1, 3, 8, 'grid', 'auto', 'popular']
+    ];
+    for (const row of sections) {
+      await run(
+        `INSERT INTO homepage_sections (title, section_key, section_type, enabled, sort_order, item_limit, layout, source_mode, filter_flag)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        row
+      );
+    }
+  }
 }
 
 module.exports = {

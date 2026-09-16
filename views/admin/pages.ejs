@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pages | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'pages' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'CMS pages' }) %>
+      <main class="admin-content">
+        <% if (successMessage) { %><p style="color:#34d399;"><%= successMessage %></p><% } %>
+        <a href="/admin/pages/new" class="btn btn-primary btn-sm" style="margin-bottom:1rem;">+ New page</a>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Title</th><th>Slug</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <% pages.forEach(p => { %>
+                <tr>
+                  <td><%= p.title %> <% if (p.is_system) { %><span class="badge badge-gold">system</span><% } %></td>
+                  <td><code>/<%= p.slug === 'about' ? 'about' : (p.slug === 'contact' ? 'contact' : p.slug) %></code></td>
+                  <td><%= p.status %></td>
+                  <td>
+                    <a class="btn btn-secondary btn-sm" href="/admin/pages/<%= p.id %>/edit">Edit</a>
+                    <% if (!p.is_system) { %>
+                      <form action="/admin/pages/<%= p.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete page?');">
+                        <button class="btn btn-secondary btn-sm" style="color:var(--accent-rose);">Delete</button>
+                      </form>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

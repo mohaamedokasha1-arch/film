@@ -16,6 +16,7 @@
 const SourceRegistry = require('./base/SourceRegistry');
 const legacySourceDescriptor = require('./legacy_source/legacySourceDescriptor');
 const { WikimediaCommonsImporter } = require('./wikimedia_commons');
+const { LocImporter } = require('./loc_national_screening_room');
 
 const registry = new SourceRegistry();
 
@@ -24,5 +25,6 @@ registry.registerLegacy(legacySourceDescriptor);
 
 // EXTERNAL sources (new, independently operating)
 registry.register(new WikimediaCommonsImporter());
+registry.register(new LocImporter());
 
 module.exports = registry;

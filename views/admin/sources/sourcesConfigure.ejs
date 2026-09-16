@@ -22,8 +22,9 @@
 
         <div style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; font-size: 0.8rem; color: #93c5fd;">
           <strong>⚖️ Legal profile (verified — see docs/SOURCE_VALIDATION_wikimedia_commons.md):</strong>
-          This source only hosts public-domain and freely-licensed files (NC/ND licenses are banned platform-wide).
-          Commercial use with ads is permitted by every license this importer accepts (PD, CC0, CC BY, CC BY-SA).
+          This source is legally reviewed per item. See
+          <% if (meta && meta.sourceValidationDoc) { %><code><%= meta.sourceValidationDoc %></code><% } else { %>docs/SOURCE_VALIDATION_*.md<% } %>.
+          Commercial use with ads is permitted only for accepted license classes (PD, CC0, CC BY, CC BY-SA, U.S. Government Work, or LOC “no known restrictions”).
           Per-item verification remains active regardless of these settings.
           <% if (meta && meta.licensePolicyUrl) { %>
             License policy: <a href="<%= meta.licensePolicyUrl %>" target="_blank" rel="noopener noreferrer" style="color:#60a5fa;"><%= meta.licensePolicyUrl %></a>

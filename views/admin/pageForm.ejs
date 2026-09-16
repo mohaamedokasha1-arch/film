@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= page ? 'Edit page' : 'New page' %> | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'pages' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: page ? ('Edit: ' + page.title) : 'New page' }) %>
+      <main class="admin-content" style="max-width:860px;">
+        <form method="POST" action="<%= page ? '/admin/pages/' + page.id + '/edit' : '/admin/pages/new' %>" style="background:var(--bg-surface);padding:1.5rem;border-radius:10px;border:1px solid var(--border-color);">
+          <div class="form-group"><label class="form-label">Title *</label><input class="form-input" name="title" required value="<%= page ? page.title : '' %>"></div>
+          <div class="form-group"><label class="form-label">Slug</label><input class="form-input" name="slug" <%= page && page.is_system ? 'readonly' : '' %> value="<%= page ? page.slug : '' %>"></div>
+          <div class="form-group"><label class="form-label">Content (HTML allowed)</label><textarea class="form-textarea" name="content" style="min-height:280px;"><%= page ? (page.content||'') : '' %></textarea>
+            <p class="form-help">Leave empty on system pages (about/contact/privacy/terms) to keep the original templates.</p>
+          </div>
+          <div class="form-group"><label class="form-label">Status</label>
+            <select class="form-select" name="status">
+              <option value="published" <%= !page || page.status === 'published' ? 'selected' : '' %>>published</option>
+              <option value="draft" <%= page && page.status === 'draft' ? 'selected' : '' %>>draft</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Meta title</label><input class="form-input" name="meta_title" value="<%= page && page.meta_title ? page.meta_title : '' %>"></div>
+          <div class="form-group"><label class="form-label">Meta description</label><textarea class="form-textarea" name="meta_description"><%= page && page.meta_description ? page.meta_description : '' %></textarea></div>
+          <label><input type="checkbox" name="show_in_nav" <%= page && page.show_in_nav ? 'checked' : '' %>> Show in nav</label>
+          <div style="margin-top:1rem;display:flex;gap:0.75rem;">
+            <button class="btn btn-primary">Save</button>
+            <a class="btn btn-secondary" href="/admin/pages">Cancel</a>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
