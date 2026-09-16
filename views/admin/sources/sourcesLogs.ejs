@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Source Import Logs | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('../sidebar', { activePage: 'movieSources' }) %>
+
+    <div class="admin-main">
+      <%- include('../topbar', { pageTitle: 'Movie Source Import Logs' }) %>
+
+      <main class="admin-content">
+        <form method="GET" action="/admin/movie-sources/logs" style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1.25rem; align-items:flex-end;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Source</label>
+            <select name="source" class="form-select">
+              <option value="all" <%= filters.source === 'all' ? 'selected' : '' %>>All Sources</option>
+              <% sourceNames.forEach(s => { %>
+                <option value="<%= s.source_name %>" <%= filters.source === s.source_name ? 'selected' : '' %>><%= s.source_name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              <% ['all','success','partial','failed','running'].forEach(s => { %>
+                <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= s %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">From</label>
+            <input type="date" name="from" value="<%= filters.from %>" class="form-input">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">To</label>
+            <input type="date" name="to" value="<%= filters.to %>" class="form-input">
+          </div>
+          <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+          <a class="btn btn-secondary btn-sm" href="/admin/movie-sources/logs">Reset</a>
+        </form>
+
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Log ID</th>
+                <th>Source</th>
+                <th>Run Started</th>
+                <th>Duration</th>
+                <th>Found</th>
+                <th>Imported</th>
+                <th>Rejected</th>
+                <th>Duplicates</th>
+                <th>Status</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (logs.length === 0) { %>
+                <tr><td colspan="10" style="text-align:center; padding:3rem; color:var(--text-muted);">No import logs match this filter.</td></tr>
+              <% } %>
+              <% logs.forEach(log => { %>
+                <tr>
+                  <td><strong>#<%= log.id %></strong></td>
+                  <td style="font-size:0.8rem;"><%= log.source_name || 'Internet Archive' %></td>
+                  <td><%= new Date(log.started_at).toLocaleString() %></td>
+                  <td><%= log.duration_seconds %>s</td>
+                  <td><%= log.items_found %></td>
+                  <td><strong style="color:#34d399;">+<%= log.items_imported %></strong></td>
+                  <td><span style="color:#fb7185; font-weight:600;"><%= log.items_rejected != null ? log.items_rejected : (log.license_rejections || 0) %></span></td>
+                  <td><span style="color:#fbbf24;"><%= log.items_duplicate != null ? log.items_duplicate : (log.duplicate_rejections || 0) %></span></td>
+                  <td>
+                    <% if (log.status === 'success') { %>
+                      <span class="badge badge-pd">Success</span>
+                    <% } else if (log.status === 'partial') { %>
+                      <span class="badge badge-gold">Partial</span>
+                    <% } else if (log.status === 'running') { %>
+                      <span class="badge" style="background:rgba(59,130,246,0.2); color:#60a5fa;">Running…</span>
+                    <% } else { %>
+                      <span class="badge" style="background:rgba(239,68,68,0.2); color:#f87171;">Failed</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <details>
+                      <summary style="cursor:pointer; color:var(--primary); font-size:0.8rem;">View Events</summary>
+                      <div style="background:#000; padding:0.75rem; border-radius:var(--radius-sm); margin-top:0.5rem; max-height:240px; overflow-y:auto; font-family:var(--font-mono); font-size:0.72rem; color:#cbd5e1; width:480px;">
+                        <% if (log.error_message) { %>
+                          <div style="color:#ef4444; margin-bottom:0.5rem;"><strong>Error:</strong> <%= log.error_message %></div>
+                        <% } %>
+                        <% let evs = []; try { evs = JSON.parse(log.log_details || '[]'); } catch(e) {} %>
+                        <% evs.forEach(ev => { %>
+                          <div style="margin-bottom:0.25rem;">
+                            <span style="color:#64748b;">[<%= ev.time ? new Date(ev.time).toLocaleTimeString() : '' %>]</span> <%= ev.message %>
+                          </div>
+                        <% }) %>
+                      </div>
+                    </details>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

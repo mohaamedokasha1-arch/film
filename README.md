@@ -246,6 +246,30 @@ sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 
 ---
 
+
+---
+
+## 📚 نظام المصادر المتعددة (Multi-Source System) — أُضيف 2026-09
+
+تمت ترقية المنصة إلى بنية **سجل مصادر معياري (Modular Source Registry)** يسمح بتشغيل عدة مصادر أفلام قانونية بشكل مستقل تماماً إلى جانب المصدر الأصلي (Internet Archive) **دون أي تعديل عليه**:
+
+- 🆕 **المصدر الجديد: Wikimedia Commons** — عبر واجهة MediaWiki Action API الرسمية (بدون مفاتيح)، مع فحص ترخيص فردي صارم لكل ملف (قبول Public Domain / CC0 / CC BY / CC BY-SA فقط، ورفض فوري لأي ترخيص NC/ND أو غامض — سياسة "الإغلاق الآمن").
+- 🏛️ **المصدر القديم (Internet Archive):** محمي بالكامل — لا يمكن تعطيله أو تعديله من واجهة المصادر الجديدة، ويستمر بمجدوله وإعداداته كما هي.
+- 🗂️ **الهيكلية:**
+  ```
+  movie_sources/
+  ├── base/            (BaseImporter, BaseFetcher, BaseParser, BaseLicenseChecker,
+  │                     BaseValidator, BaseDuplicateChecker, SourceRegistry)
+  ├── legacy_source/   (وصف للقراءة فقط للمصدر القديم)
+  ├── wikimedia_commons/ (Fetcher + Parser + LicenseChecker + Validator + Importer)
+  └── index.js         (نقطة تسجيل المصادر — سطر واحد لإضافة مصدر جديد)
+  ```
+- 🎛️ **لوحة إدارة المصادر:** `/admin/movie-sources` — بطاقة حالة لكل مصدر (آخر/تالي استيراد، إحصائيات آخر دورة، اختبار اتصال حقيقي، تشغيل فوري، تفعيل/تعطيل، إعدادات)، شاشة كونسول حية (SSE)، عارض سجلات الاستيراد بفلاتر، وسجل العناصر المرفوضة مع أسباب الرفض والبيانات الخام للتدقيق القانوني.
+- ⏰ **مجدول مصادر مستقل:** كل 6 ساعات (قابل للضبط `source_import_frequency_hours`) مع منع التداخل — منفصل تماماً عن مجدول المصدر القديم.
+- 🗄️ **ترحيلات قاعدة بيانات إضافية وعكوسة:** أعمدة `source_id/source_type/can_rehost/original_source_url` على الأفلام (مع وسم الأفلام القديمة تلقائياً كـ legacy)، جدولا `movie_sources` و`rejected_items`، وتوسيع `import_logs` — دون حذف أو تعديل أي بيانات قائمة.
+- 📑 **التوثيق القانوني:** `docs/SOURCE_VALIDATION_wikimedia_commons.md` (قالب التحقق الإلزامي مع الأدلة)، `docs/ADMIN_GUIDE_movie_sources.md` (دليل الاستخدام)، `docs/IMPLEMENTATION_REPORT.md` (تقرير التطبيق وقائمة المراجعة).
+- 🧪 **اختبارات:** `npm test` — 27 اختباراً تغطي فحص التراخيص، خط الأنابيب الكامل، منع التكرار بين المصادر، حماية بيانات المصدر القديم، وعكس الترحيلات.
+
 ## 🛡️ سياسة الـ DMCA وإخلاء المسؤولية القانونية
 
 - المنصة لا تستضيف أي ملفات فيديو ذات حقوق حصرية.

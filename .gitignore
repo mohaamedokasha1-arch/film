@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# Test artifacts (fixtures ARE committed — recorded real API responses)
+test/test_akavox.db
+test/*.log
+
+# Runtime artifacts
+*.log
+npm-debug.log*

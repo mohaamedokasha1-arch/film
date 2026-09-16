@@ -1,70 +1,156 @@
-const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const defaultSettings = require('../config/defaultSettings');
 
-const DB_PATH = path.join(__dirname, 'akavox.db');
+const DB_PATH = process.env.AKAVOX_DB_PATH || path.join(__dirname, 'akavox.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
 
-let dbInstance = null;
+/**
+ * ---------------------------------------------------------------------------
+ * Dual-Engine Database Layer (AKAVOX)
+ * ---------------------------------------------------------------------------
+ * Primary engine  : sqlite3 (native, production standard — unchanged behavior)
+ * Fallback engine : sql.js  (pure WebAssembly SQLite, zero native compilation)
+ *
+ * The fallback exists purely for constrained environments (e.g. CI sandboxes
+ * or hosts where the native sqlite3 binding cannot be compiled). Both engines
+ * expose the exact same async API: query / get / run / exec.
+ * ---------------------------------------------------------------------------
+ */
+
+let engine = null;
+let engineReadyPromise = null;
+let sqljsSaveTimer = null;
+
+function locateWasm(file) {
+  return path.join(__dirname, '..', 'node_modules', 'sql.js', 'dist', file);
+}
+
+async function initEngine() {
+  // Attempt native sqlite3 first (production path)
+  try {
+    const sqlite3 = require('sqlite3');
+    const db = await new Promise((resolve, reject) => {
+      const instance = new sqlite3Module.Database(DB_PATH, (err) => {
+        if (err) reject(err); else resolve(instance);
+      });
+      instance.on('error', (err) => reject(err));
+    });
+    console.log('✅ SQLite (native) connected:', DB_PATH);
+    db.run('PRAGMA journal_mode = WAL;');
+    db.run('PRAGMA foreign_keys = ON;');
+    return { kind: 'sqlite3', db };
+  } catch (nativeErr) {
+    console.warn('⚠️  Native sqlite3 unavailable (' + (nativeErr.message || nativeErr) + '). Falling back to sql.js (WASM).');
+  }
+
+  // Fallback: sql.js (WebAssembly) — same SQL semantics, in-memory with persistence
+  const initSqlJs = require('sql.js');
+  const SQL = await initSqlJs({ locateFile: locateWasm });
+  const existing = fs.existsSync(DB_PATH) ? fs.readFileSync(DB_PATH) : null;
+  const db = existing ? new SQL.Database(existing) : new SQL.Database();
+  try { db.run('PRAGMA foreign_keys = ON;'); } catch (e) { /* pragma advisory only */ }
+  console.log('✅ SQLite (sql.js WASM) connected:', DB_PATH);
+  return { kind: 'sqljs', db };
+}
+
+function getEngine() {
+  if (!engineReadyPromise) {
+    engineReadyPromise = initEngine().then((eng) => { engine = eng; return eng; });
+  }
+  return engineReadyPromise;
+}
+
+function persistSqljs() {
+  if (!engine || engine.kind !== 'sqljs') return;
+  if (sqljsSaveTimer) clearTimeout(sqljsSaveTimer);
+  sqljsSaveTimer = setTimeout(() => {
+    try {
+      const data = Buffer.from(engine.db.export());
+      fs.writeFileSync(DB_PATH, data);
+    } catch (e) {
+      console.error('❌ Failed to persist sql.js database:', e.message);
+    }
+  }, 50);
+}
 
 function getDb() {
-  if (!dbInstance) {
-    dbInstance = new sqlite3.Database(DB_PATH, (err) => {
-      if (err) {
-        console.error('❌ Failed to open database:', err.message);
-      } else {
-        console.log('✅ SQLite connected:', DB_PATH);
-      }
-    });
+  // Preserved for backwards compatibility. Returns the raw engine handle.
+  return engine ? engine.db : null;
+}
 
-    // Enable WAL mode & foreign keys for high performance & integrity
-    dbInstance.run('PRAGMA journal_mode = WAL;');
-    dbInstance.run('PRAGMA foreign_keys = ON;');
+// ---------------------------------------------------------------------------
+// Async wrapper methods (identical contract for both engines)
+// ---------------------------------------------------------------------------
+async function query(sql, params = []) {
+  const eng = await getEngine();
+  if (eng.kind === 'sqlite3') {
+    return new Promise((resolve, reject) => {
+      eng.db.all(sql, params, (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows || []);
+      });
+    });
   }
-  return dbInstance;
+  const stmt = eng.db.prepare(sql);
+  try {
+    stmt.bind(params);
+    const rows = [];
+    while (stmt.step()) rows.push(stmt.getAsObject());
+    return rows;
+  } finally {
+    stmt.free();
+  }
 }
 
-// Async wrapper methods
-function query(sql, params = []) {
-  const db = getDb();
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) return reject(err);
-      resolve(rows || []);
+async function get(sql, params = []) {
+  const eng = await getEngine();
+  if (eng.kind === 'sqlite3') {
+    return new Promise((resolve, reject) => {
+      eng.db.get(sql, params, (err, row) => {
+        if (err) return reject(err);
+        resolve(row || null);
+      });
     });
-  });
+  }
+  const rows = await query(sql, params);
+  return rows.length > 0 ? rows[0] : null;
 }
 
-function get(sql, params = []) {
-  const db = getDb();
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) return reject(err);
-      resolve(row || null);
+async function run(sql, params = []) {
+  const eng = await getEngine();
+  if (eng.kind === 'sqlite3') {
+    return new Promise((resolve, reject) => {
+      eng.db.run(sql, params, function (err) {
+        if (err) return reject(err);
+        resolve({ lastID: this.lastID, changes: this.changes });
+      });
     });
-  });
+  }
+  eng.db.run(sql, params);
+  const changes = eng.db.getRowsModified();
+  let lastID = null;
+  const res = eng.db.exec('SELECT last_insert_rowid() AS id');
+  if (res && res[0] && res[0].values && res[0].values[0]) {
+    lastID = res[0].values[0][0];
+  }
+  persistSqljs();
+  return { lastID, changes };
 }
 
-function run(sql, params = []) {
-  const db = getDb();
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
-      if (err) return reject(err);
-      resolve({ lastID: this.lastID, changes: this.changes });
+async function exec(sql) {
+  const eng = await getEngine();
+  if (eng.kind === 'sqlite3') {
+    return new Promise((resolve, reject) => {
+      eng.db.exec(sql, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
     });
-  });
-}
-
-function exec(sql) {
-  const db = getDb();
-  return new Promise((resolve, reject) => {
-    db.exec(sql, (err) => {
-      if (err) return reject(err);
-      resolve();
-    });
-  });
+  }
+  eng.db.exec(sql);
+  persistSqljs();
 }
 
 // Helper to hash passwords (SHA256 with salt)
@@ -117,9 +203,13 @@ async function setSetting(key, value, type = 'string') {
 
 // Initialize database schema and seeds
 async function initDb() {
-  getDb();
+  await getEngine();
   const schemaSql = fs.readFileSync(SCHEMA_PATH, 'utf8');
   await exec(schemaSql);
+
+  // Additive, reversible migrations (new source system — never drops legacy data)
+  const { runMigrations } = require('./migrations');
+  await runMigrations();
 
   // Seed default settings
   for (const setting of defaultSettings) {
@@ -143,6 +233,8 @@ async function initDb() {
     console.log('🔐 Default admin account created: username: "admin", password: "admin123"');
   }
 
+  // Flush sql.js persistence after bootstrap writes
+  persistSqljs();
   console.log('✅ Database initialized successfully');
 }
 
