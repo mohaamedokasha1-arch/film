@@ -212,7 +212,9 @@ class BaseImporter {
   }
 
   async _insertMovie(candidate, license, settings) {
-    const baseSlug = this._slugify(`${candidate.title}-${candidate.year || ''}`);
+    // Avoid duplicated years in slugs when the title already ends with (year)
+    const titleSlug = this._slugify(candidate.title);
+    const baseSlug = titleSlug.endsWith(`-${candidate.year}`) ? titleSlug : this._slugify(`${candidate.title}-${candidate.year || ''}`);
     let slug = baseSlug;
     let counter = 1;
     while (await get('SELECT id FROM movies WHERE slug = ?', [slug])) {
@@ -302,7 +304,7 @@ class BaseImporter {
     return String(text)
       .toLowerCase()
       .replace(/['’]/g, '')
-      .replace(/[^a-z0-9\u0600-\u06FF]+/g, '-')
+      .replace(/[^a-z0-9\u0600-\u06FF\u0400-\u04FF\u0900-\u097F]+/g, '-')
       .replace(/(^-|-$)/g, '') || 'film';
   }
 

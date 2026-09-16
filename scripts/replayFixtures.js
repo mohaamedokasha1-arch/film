@@ -57,7 +57,11 @@ function fixtureFor(url) {
     "INSERT INTO settings (key, value, type) VALUES ('commons_search_queries', ?, 'string') ON CONFLICT(key) DO UPDATE SET value=excluded.value",
     ['"Night of the Living Dead"|incategory:"Videos of films in the public domain"|"CC BY-SA"|GFDL']
   );
-  await run("INSERT INTO settings (key, value, type) VALUES ('commons_min_duration_seconds', '180', 'int') ON CONFLICT(key) DO UPDATE SET value=excluded.value");
+  const minDuration = parseInt((process.argv.find(a => a.startsWith('--min-duration=')) || '').split('=')[1] || '180', 10);
+  await run(
+    "INSERT INTO settings (key, value, type) VALUES ('commons_min_duration_seconds', ?, 'int') ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+    [String(minDuration)]
+  );
 
   console.log('▶ Replaying recorded Commons API batches through the production pipeline…\n');
   importer.addLogListener((ev) => {

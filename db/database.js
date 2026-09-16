@@ -75,6 +75,13 @@ function persistSqljs() {
   }, 50);
 }
 
+// Flush pending sql.js persistence on process exit (debounce timer dies with the process)
+process.on('exit', () => {
+  if (engine && engine.kind === 'sqljs') {
+    try { fs.writeFileSync(DB_PATH, Buffer.from(engine.db.export())); } catch (e) { /* best effort */ }
+  }
+});
+
 function getDb() {
   // Preserved for backwards compatibility. Returns the raw engine handle.
   return engine ? engine.db : null;
