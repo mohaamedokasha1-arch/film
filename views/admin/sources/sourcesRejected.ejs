@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rejected Items | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('../sidebar', { activePage: 'movieSources' }) %>
+
+    <div class="admin-main">
+      <%- include('../topbar', { pageTitle: 'Rejected Items — Legal & Quality Blocks' }) %>
+
+      <main class="admin-content">
+        <div style="background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.3); padding: 0.85rem 1.25rem; border-radius: var(--radius-sm); color: #fcd34d; font-size: 0.8rem; margin-bottom: 1.25rem;">
+          ⚖️ Every item below was blocked by the license checker or validator BEFORE entering the library. Rejections are fail-closed: unclear rights are treated as NO rights. These items are re-checked on future runs only if their source metadata changes.
+        </div>
+
+        <form method="GET" action="/admin/movie-sources/rejected" style="display:flex; gap:0.75rem; margin-bottom:1.25rem; align-items:flex-end;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Filter by Source</label>
+            <select name="source" class="form-select">
+              <option value="all" <%= sourceFilter === 'all' ? 'selected' : '' %>>All Sources</option>
+              <% sourceNames.forEach(s => { %>
+                <option value="<%= s.source_name %>" <%= sourceFilter === s.source_name ? 'selected' : '' %>><%= s.source_name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" type="submit">Filter</button>
+        </form>
+
+        <% if (items.length === 0) { %>
+          <div style="text-align:center; padding:3rem; color:var(--text-muted);">No rejected items recorded. ✅</div>
+        <% } %>
+
+        <% items.forEach(item => { %>
+          <div class="kpi-card" style="padding:1.25rem; margin-bottom:1rem;">
+            <div style="display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+              <div>
+                <h3 style="color:#fff; font-size:0.95rem; font-weight:700;"><%= item.item_title || item.external_id || 'Unknown item' %></h3>
+                <div style="font-size:0.75rem; color:var(--text-dim); margin-top:0.3rem;">
+                  Source: <strong><%= item.source_name %></strong>
+                  · Stage: <span class="badge badge-gold" style="font-size:0.65rem;"><%= item.rejection_stage || 'unknown' %></span>
+                  · Rejected: <%= new Date(item.rejected_at).toLocaleString() %>
+                </div>
+              </div>
+              <form method="POST" action="/admin/movie-sources/rejected/<%= item.id %>/delete" onsubmit="return confirm('Remove this rejection record?');">
+                <button class="btn btn-secondary btn-sm" type="submit">Delete Record</button>
+              </form>
+            </div>
+            <div style="margin-top:0.75rem; padding:0.75rem; background:rgba(239,68,68,0.08); border-left:3px solid #ef4444; border-radius:4px; color:#fca5a5; font-size:0.8rem;">
+              <strong>Reason:</strong> <%= item.rejection_reason %>
+            </div>
+            <% if (item.source_url) { %>
+              <div style="margin-top:0.5rem;">
+                <a href="<%= item.source_url %>" target="_blank" rel="noopener noreferrer" style="color:var(--primary); font-size:0.75rem;">Inspect original at source ↗</a>
+              </div>
+            <% } %>
+            <details style="margin-top:0.6rem;">
+              <summary style="cursor:pointer; color:var(--primary); font-size:0.8rem;">View Raw Data</summary>
+              <pre style="background:#000; padding:0.85rem; border-radius:var(--radius-sm); margin-top:0.5rem; max-height:260px; overflow:auto; font-family:var(--font-mono); font-size:0.68rem; color:#94a3b8; white-space:pre-wrap;"><% let raw = {}; try { raw = JSON.parse(item.raw_data || '{}'); } catch(e) { raw = item.raw_data; } %><%= JSON.stringify(raw, (k, v) => k === 'license' && v && v.rawExtMetadata ? { shortName: v.shortName, usageTerms: v.usageTerms, licenseUrl: v.licenseUrl, attributionRequiredFlag: v.attributionRequiredFlag, copyrightedFlag: v.copyrightedFlag, licenseCode: v.licenseCode } : v, 2) %></pre>
+            </details>
+          </div>
+        <% }) %>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

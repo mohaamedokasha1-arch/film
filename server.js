@@ -3,11 +3,13 @@ const path = require('path');
 const cookieSession = require('cookie-session');
 const { initDb, get, query } = require('./db/database');
 const scheduler = require('./services/scheduler');
+const sourceScheduler = require('./services/sourceScheduler'); // NEW: multi-source scheduler (additive)
 const movieImporter = require('./services/importer');
 
 const publicRoutes = require('./routes/publicRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const apiRoutes = require('./routes/apiRoutes');
+const movieSourceRoutes = require('./routes/movieSourceRoutes'); // NEW: multi-source manager
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,6 +35,9 @@ app.use(cookieSession({
 
 // API Routes
 app.use('/api', apiRoutes);
+
+// Movie Sources Manager (NEW — additive, mounted before the generic /admin router)
+app.use('/admin/movie-sources', movieSourceRoutes);
 
 // Admin Routes
 app.use('/admin', adminRoutes);
@@ -93,6 +98,10 @@ async function bootstrap() {
 
     // Start background automated scheduler
     await scheduler.start();
+
+    // Start the multi-source scheduler for registered external sources
+    // (ADDITIVE — the legacy Internet Archive scheduler above is untouched)
+    await sourceScheduler.start();
 
     app.listen(PORT, HOST, () => {
       console.log(`=======================================================`);

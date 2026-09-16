@@ -15,6 +15,16 @@ module.exports = [
   { key: 'archive_search_collections', value: 'feature_films,silent_films,Comedy_Films,classic_tv,scifi_horror', type: 'string' },
   { key: 'archive_rows_per_import', value: '15', type: 'int' },
   { key: 'archive_sort_order', value: 'downloads desc', type: 'string' },
+
+  // Multi-Source System (NEW — Wikimedia Commons external source; additive)
+  { key: 'commons_enabled', value: 'true', type: 'boolean' },
+  { key: 'commons_search_queries', value: 'incategory:"Videos of films in the public domain"|incategory:"Films from Archive.org"|incategory:"Films by Georges Méliès"|incategory:"Films by Charlie Chaplin"', type: 'string' },
+  { key: 'commons_batch_size', value: '10', type: 'int' },
+  { key: 'commons_min_duration_seconds', value: '180', type: 'int' },
+  { key: 'commons_rate_delay_ms', value: '500', type: 'int' },
+  { key: 'commons_query_offsets', value: '{}', type: 'json' },
+  { key: 'source_scheduler_enabled', value: 'true', type: 'boolean' },
+  { key: 'source_import_frequency_hours', value: '6', type: 'int' },
   
   // Strict License Rules
   { key: 'license_allow_public_domain', value: 'true', type: 'boolean' },

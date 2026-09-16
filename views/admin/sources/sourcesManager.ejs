@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Sources | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('../sidebar', { activePage: 'movieSources' }) %>
+
+    <div class="admin-main">
+      <%- include('../topbar', { pageTitle: 'Movie Sources Manager' }) %>
+
+      <main class="admin-content">
+        <% if (typeof saved !== 'undefined' && saved) { %>
+          <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); padding: 1rem; border-radius: var(--radius-sm); color: #34d399; margin-bottom: 1.5rem;">Configuration saved.</div>
+        <% } %>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem;">
+          <div>
+            <h2 style="font-size:1.15rem; font-weight:700; color:#fff;">Registered Library Sources</h2>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Each source operates independently. The legacy pipeline is protected and can never be modified or disabled here.</p>
+          </div>
+          <div style="font-size:0.8rem; color:var(--text-dim);">
+            Multi-source scheduler: <strong style="color:<%= schedulerState && schedulerState.active ? '#34d399' : '#f87171' %>;"><%= schedulerState && schedulerState.active ? '● ACTIVE' : '○ STOPPED' %></strong>
+            <% if (schedulerState && schedulerState.nextRunAt) { %>
+              · next cycle <%= new Date(schedulerState.nextRunAt).toLocaleString() %>
+            <% } %>
+          </div>
+        </div>
+
+        <% sources.forEach(source => { %>
+          <div class="kpi-card" style="margin-bottom:1.25rem; padding:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem;">
+              <div>
+                <h3 style="color:#fff; font-size:1.05rem; font-weight:700; margin-bottom:0.35rem;">
+                  <%= source.name %>
+                  <% if (source.sourceType === 'legacy') { %>
+                    <span class="badge badge-gold" style="margin-left:0.5rem;">LEGACY · PROTECTED</span>
+                  <% } else { %>
+                    <span class="badge badge-pd" style="margin-left:0.5rem;">EXTERNAL SOURCE</span>
+                  <% } %>
+                </h3>
+                <% if (source.officialUrl) { %>
+                  <a href="<%= source.officialUrl %>" target="_blank" rel="noopener noreferrer" style="color:var(--primary); font-size:0.8rem;"><%= source.officialUrl %></a>
+                <% } %>
+              </div>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                <% if (source.enabled) { %>
+                  <span class="badge badge-pd">● Active</span>
+                <% } else if (source.status === 'error') { %>
+                  <span class="badge" style="background:rgba(239,68,68,0.2); color:#f87171;">⚠ Error</span>
+                <% } else { %>
+                  <span class="badge" style="background:rgba(148,163,184,0.2); color:#94a3b8;">○ Disabled</span>
+                <% } %>
+                <% if (source.connectionStatus) { %>
+                  <span class="badge <%= String(source.connectionStatus).startsWith('OK') ? 'badge-pd' : '' %>" style="<%= String(source.connectionStatus).startsWith('OK') ? '' : 'background:rgba(239,68,68,0.2); color:#f87171;' %>" title="<%= source.connectionStatus %> · tested <%= source.lastConnectionTest ? new Date(source.lastConnectionTest).toLocaleString() : '' %>">
+                    <%= String(source.connectionStatus).startsWith('OK') ? '✓ Connected' : '✗ Connection failed' %>
+                  </span>
+                <% } %>
+                <% if (source.isRunning) { %>
+                  <span class="badge" style="background:rgba(59,130,246,0.2); color:#60a5fa;">⏳ Importing…</span>
+                <% } %>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:1rem; margin:1.25rem 0;">
+              <div>
+                <div class="kpi-label">Total Movies</div>
+                <div class="kpi-value" style="font-size:1.4rem;"><%= (source.totalImported || 0).toLocaleString() %></div>
+              </div>
+              <div>
+                <div class="kpi-label">Last Import</div>
+                <div style="color:#d1d5db; font-size:0.85rem;"><%= source.lastImportAt ? new Date(source.lastImportAt).toLocaleString() : 'Never' %></div>
+              </div>
+              <div>
+                <div class="kpi-label">Next Scheduled</div>
+                <div style="color:#d1d5db; font-size:0.85rem;"><%= source.nextRunAt ? new Date(source.nextRunAt).toLocaleString() : (source.sourceType === 'legacy' ? 'Managed by legacy scheduler' : '—') %></div>
+              </div>
+              <% if (source.lastRun) { %>
+                <div>
+                  <div class="kpi-label">Last Run Stats</div>
+                  <div style="color:#d1d5db; font-size:0.8rem;">
+                    Found <%= source.lastRun.items_found %> ·
+                    <span style="color:#34d399;">Imported <%= source.lastRun.items_imported %></span> ·
+                    <span style="color:#fb7185;">Rejected <%= source.lastRun.items_rejected != null ? source.lastRun.items_rejected : source.lastRun.license_rejections %></span> ·
+                    <span style="color:#fbbf24;">Dup <%= source.lastRun.items_duplicate != null ? source.lastRun.items_duplicate : source.lastRun.duplicate_rejections %></span>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <% if (source.sourceType === 'legacy') { %>
+                <button class="btn btn-secondary btn-sm" onclick="runLegacyImport(this)">Run Now (Legacy Pipeline)</button>
+              <% } else { %>
+                <button class="btn btn-primary btn-sm" onclick="runSource('<%= source.key %>', this)">Run Now</button>
+                <button class="btn btn-secondary btn-sm" onclick="testSource('<%= source.key %>', this)">Test Connection</button>
+                <form method="POST" action="/admin/movie-sources/<%= source.key %>/toggle" style="display:inline;" onsubmit="return confirm('<%= source.enabled ? 'Disable' : 'Enable' %> <%= source.name %>?')">
+                  <button class="btn btn-secondary btn-sm" type="submit"><%= source.enabled ? 'Disable' : 'Enable' %></button>
+                </form>
+              <% } %>
+              <a class="btn btn-secondary btn-sm" href="/admin/movie-sources/logs?source=<%= encodeURIComponent(source.name) %>">View Logs</a>
+              <a class="btn btn-secondary btn-sm" href="/admin/movie-sources/rejected?source=<%= encodeURIComponent(source.name) %>">Rejected Items</a>
+              <% if (source.modifiable) { %>
+                <a class="btn btn-secondary btn-sm" href="/admin/movie-sources/<%= source.key %>/configure">Configure</a>
+              <% } %>
+            </div>
+
+            <% if (source.protectionNote) { %>
+              <div style="margin-top:0.85rem; font-size:0.75rem; color:#fbbf24;">🔒 <%= source.protectionNote %></div>
+            <% } %>
+          </div>
+        <% }) %>
+
+        <!-- Live Import Console (Server-Sent Events) -->
+        <div class="kpi-card" style="padding:1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <h3 style="color:#fff; font-size:1rem; font-weight:700;">Live Import Console — External Sources</h3>
+            <div id="sseStatus" class="badge" style="background:rgba(148,163,184,0.2); color:#94a3b8;">○ Idle</div>
+          </div>
+          <div id="liveConsole" style="background:#000; border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:1rem; height:280px; overflow-y:auto; font-family:var(--font-mono); font-size:0.75rem; color:#cbd5e1; line-height:1.6;">
+            <div style="color:#64748b;">Console ready. Trigger a source run to watch the fetch → license check → validation → deduplication pipeline live.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:1rem; font-size:0.75rem; color:var(--text-dim);">
+          ➕ Add a new source: create <code>movie_sources/&lt;source_key&gt;/</code> implementing Fetcher → Parser → LicenseChecker → Validator, then register it in <code>movie_sources/index.js</code>. See <code>docs/ADMIN_GUIDE_movie_sources.md</code>.
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function appendLog(line, color) {
+      const box = document.getElementById('liveConsole');
+      const div = document.createElement('div');
+      if (color) div.style.color = color;
+      div.textContent = '[' + new Date().toLocaleTimeString() + '] ' + line;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    // Live SSE stream
+    const evtSource = new EventSource('/admin/movie-sources/api/stream');
+    const colorMap = {
+      license_rejected: '#fb7185', validation_rejected: '#fb7185', error: '#ef4444',
+      license_accepted: '#34d399', imported: '#34d399', duplicate_skipped: '#fbbf24',
+      completed: '#60a5fa', fetch_success: '#60a5fa'
+    };
+    evtSource.onmessage = (e) => {
+      try {
+        const ev = JSON.parse(e.data);
+        if (ev.type === 'ping') return;
+        appendLog('[' + (ev.source || 'source') + '] ' + ev.message, colorMap[ev.type] || null);
+        const badge = document.getElementById('sseStatus');
+        if (ev.type === 'completed') {
+          badge.textContent = '○ Idle';
+          badge.style.background = 'rgba(148,163,184,0.2)'; badge.style.color = '#94a3b8';
+        } else if (['fetch','fetch_success','processing_item','license_accepted','license_rejected','validation_rejected','duplicate_skipped','imported','error'].includes(ev.type)) {
+          badge.textContent = '⏳ Importing…';
+          badge.style.background = 'rgba(59,130,246,0.2)'; badge.style.color = '#60a5fa';
+        }
+      } catch (err) {}
+    };
+
+    async function runSource(key, btn) {
+      btn.disabled = true; btn.textContent = 'Starting…';
+      const res = await fetch('/admin/movie-sources/api/run/' + key, { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' });
+      const data = await res.json();
+      appendLog(data.message, data.status === 'started' ? '#34d399' : '#fbbf24');
+      btn.disabled = false; btn.textContent = 'Run Now';
+    }
+    async function runLegacyImport(btn) {
+      btn.disabled = true; btn.textContent = 'Starting…';
+      const res = await fetch('/api/admin/import/trigger', { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' });
+      const data = await res.json();
+      appendLog('Legacy Internet Archive import: ' + (data.message || data.status), data.status === 'started' ? '#34d399' : '#fbbf24');
+      btn.disabled = false; btn.textContent = 'Run Now (Legacy Pipeline)';
+    }
+    async function testSource(key, btn) {
+      btn.disabled = true; btn.textContent = 'Testing…';
+      const res = await fetch('/admin/movie-sources/api/test/' + key, { method: 'POST' });
+      const data = await res.json();
+      appendLog('Connection test [' + key + ']: ' + data.detail, data.ok ? '#34d399' : '#fb7185');
+      btn.disabled = false; btn.textContent = 'Test Connection';
+      setTimeout(() => window.location.reload(), 1200);
+    }
+  </script>
+</body>
+</html>

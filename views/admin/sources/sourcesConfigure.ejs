@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Configure <%= sourceName %> | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('../sidebar', { activePage: 'movieSources' }) %>
+
+    <div class="admin-main">
+      <%- include('../topbar', { pageTitle: 'Configure Source — ' + sourceName }) %>
+
+      <main class="admin-content" style="max-width: 840px;">
+        <% if (successMessage) { %>
+          <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); padding: 1rem; border-radius: var(--radius-sm); color: #34d399; margin-bottom: 1.5rem;">
+            <%= successMessage %>
+          </div>
+        <% } %>
+
+        <div style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; font-size: 0.8rem; color: #93c5fd;">
+          <strong>⚖️ Legal profile (verified — see docs/SOURCE_VALIDATION_wikimedia_commons.md):</strong>
+          This source only hosts public-domain and freely-licensed files (NC/ND licenses are banned platform-wide).
+          Commercial use with ads is permitted by every license this importer accepts (PD, CC0, CC BY, CC BY-SA).
+          Per-item verification remains active regardless of these settings.
+          <% if (meta && meta.licensePolicyUrl) { %>
+            License policy: <a href="<%= meta.licensePolicyUrl %>" target="_blank" rel="noopener noreferrer" style="color:#60a5fa;"><%= meta.licensePolicyUrl %></a>
+          <% } %>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2rem;">
+          <form action="/admin/movie-sources/<%= sourceKey %>/configure" method="POST">
+            <div class="form-group">
+              <label class="form-label">Search Queries (separated by <code>|</code>)</label>
+              <textarea name="commons_search_queries" class="form-input" rows="4"><%= siteSettings.commons_search_queries || '' %></textarea>
+              <div class="form-help">Official Commons search keywords. Each run rotates through these queries using incremental offsets, so new material is discovered every cycle. Example category queries: <code>incategory:"Videos of films in the public domain"</code>, <code>incategory:"Films from Archive.org"</code>, or plain keywords like <code>silent film</code>. <code>filetype:video</code> is always enforced automatically.</div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+              <div class="form-group">
+                <label class="form-label">Candidates per Cycle</label>
+                <input type="number" name="commons_batch_size" value="<%= siteSettings.commons_batch_size %>" class="form-input" min="3" max="50" required>
+                <div class="form-help">Items fetched from the source per run (10 recommended — API etiquette caps pages at 50).</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Schedule Interval (Hours)</label>
+                <input type="number" name="source_import_frequency_hours" value="<%= siteSettings.source_import_frequency_hours %>" class="form-input" min="1" max="168" required>
+                <div class="form-help">Automated multi-source import cadence (default 6h — independent from the legacy scheduler).</div>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+              <div class="form-group">
+                <label class="form-label">Minimum Duration (Seconds)</label>
+                <input type="number" name="commons_min_duration_seconds" value="<%= siteSettings.commons_min_duration_seconds %>" class="form-input" min="0" max="7200" required>
+                <div class="form-help">Filters out short clips; 180s keeps early-cinema shorts while excluding fragments.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Request Delay (Milliseconds)</label>
+                <input type="number" name="commons_rate_delay_ms" value="<%= siteSettings.commons_rate_delay_ms %>" class="form-input" min="250" max="5000" required>
+                <div class="form-help">Politeness delay between API calls (Wikimedia API etiquette). Do not set below 250ms.</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" style="display:flex; align-items:center; gap:0.6rem;">
+                <input type="checkbox" name="source_scheduler_enabled" value="true" <%= String(siteSettings.source_scheduler_enabled) === 'true' ? 'checked' : '' %> style="width:auto;">
+                Enable automated multi-source scheduler
+              </label>
+              <div class="form-help">Runs every enabled external source on the interval above. The legacy Internet Archive scheduler is configured separately and is never affected.</div>
+            </div>
+
+            <div style="display:flex; gap:0.75rem; margin-top:1.5rem;">
+              <button type="submit" class="btn btn-primary">Save Configuration</button>
+              <a href="/admin/movie-sources" class="btn btn-secondary">Back to Sources</a>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

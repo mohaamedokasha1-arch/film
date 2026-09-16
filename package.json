@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "seed": "node services/seedRunner.js",
-    "import:now": "node services/manualImport.js"
+    "import:now": "node services/manualImport.js",
+    "test": "node test/pipeline.test.js",
+    "sources:replay-fixtures": "node scripts/replayFixtures.js"
   },
   "keywords": [
     "public-domain",
