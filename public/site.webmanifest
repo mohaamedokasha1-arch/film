@@ -1,7 +1,7 @@
 {
-  "name": "AKASHA HUB",
-  "short_name": "AKASHA",
-  "description": "AKASHA HUB — Timeless Public Domain & Legal Classic Cinema. Stream verified legal classic movies, free forever.",
+  "name": "AKAVOX",
+  "short_name": "AKAVOX",
+  "description": "AKAVOX — Timeless Public Domain & Legal Classic Cinema. Stream verified legal classic movies, free forever.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

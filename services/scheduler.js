@@ -1,5 +1,5 @@
 /**
- * Automated Scheduler for AKASHA HUB
+ * Automated Scheduler for AKAVOX
  * Periodically executes import jobs based on configurable intervals.
  */
 

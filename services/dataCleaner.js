@@ -1,5 +1,5 @@
 /**
- * Data Cleaner & Normalizer for AKASHA HUB
+ * Data Cleaner & Normalizer for AKAVOX
  * Sanitizes and structures raw metadata from external sources.
  */
 

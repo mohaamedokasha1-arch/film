@@ -1,5 +1,5 @@
 /**
- * Duplicate Detector for AKASHA HUB
+ * Duplicate Detector for AKAVOX
  * Checks whether an incoming movie already exists in the database
  * using External ID, Source URL, or Normalized Title + Year.
  */

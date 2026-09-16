@@ -1,4 +1,4 @@
-// AKASHA HUB Admin Scripts
+// AKAVOX Admin Scripts
 document.addEventListener('DOMContentLoaded', () => {
   // Manual Import Trigger Button
   const runImportBtn = document.getElementById('btn-run-import');

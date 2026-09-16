@@ -76,7 +76,7 @@ router.get('/movie/:slug', async (req, res, next) => {
 
     if (!movie) {
       return res.status(404).render('public/search', {
-        pageTitle: 'Movie Not Found | AKASHA HUB',
+        pageTitle: 'Movie Not Found | AKAVOX',
         metaDescription: 'The requested film could not be found.',
         canonicalUrl: '',
         searchQuery: slug.replace(/-/g, ' '),
@@ -371,7 +371,7 @@ router.get('/terms-of-service', (req, res) => {
   const baseUrl = `${req.protocol}://${req.get('host')}`;
   res.render('public/terms', {
     pageTitle: `Terms of Service | ${res.locals.siteSettings.site_name}`,
-    metaDescription: 'Terms of service and public domain cultural heritage disclaimers for AKASHA HUB.',
+    metaDescription: 'Terms of service and public domain cultural heritage disclaimers for AKAVOX.',
     canonicalUrl: `${baseUrl}/terms-of-service`,
     breadcrumbs: [{ name: 'Terms of Service', url: '/terms-of-service' }],
     activeNav: ''
