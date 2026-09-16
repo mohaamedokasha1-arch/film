@@ -1,0 +1,41 @@
+<% 
+  let gList = [];
+  try {
+    gList = Array.isArray(movie.genres) ? movie.genres : JSON.parse(movie.genres || '[]');
+  } catch(e) { gList = ['Classic']; }
+  const mainGenre = gList.length > 0 ? gList[0] : 'Classic';
+%>
+<article class="movie-card">
+  <a href="/movie/<%= movie.slug %>" class="movie-poster-box">
+    <img 
+      src="<%= movie.poster_url || '/images/placeholder-poster.svg' %>" 
+      alt="<%= movie.title %><%= movie.year ? ' (' + movie.year + ')' : '' %> poster" 
+      class="movie-poster-img"
+      loading="lazy"
+    >
+    <div class="card-play-overlay">
+      <div class="play-icon-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+      </div>
+    </div>
+    <div class="card-badges">
+      <% if (movie.year) { %>
+        <span class="badge badge-gold"><%= movie.year %></span>
+      <% } else { %>
+        <span></span>
+      <% } %>
+      <span class="badge badge-pd">PD</span>
+    </div>
+  </a>
+  <div class="card-info">
+    <h3 class="movie-card-title">
+      <a href="/movie/<%= movie.slug %>"><%= movie.title %></a>
+    </h3>
+    <div class="movie-card-meta">
+      <a href="/genre/<%= mainGenre.toLowerCase() %>" class="badge-genre"><%= mainGenre %></a>
+      <% if (movie.duration) { %>
+        <span>• <%= movie.duration %>m</span>
+      <% } %>
+    </div>
+  </div>
+</article>

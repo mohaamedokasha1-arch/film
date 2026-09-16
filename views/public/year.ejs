@@ -1,0 +1,53 @@
+<%- include('../partials/header') %>
+
+<div class="container" style="padding: 2.5rem 1.25rem 4rem;">
+  <%- include('../partials/breadcrumbs', { breadcrumbs }) %>
+
+  <!-- Header Ad Placeholder -->
+  <%- include('../partials/adSlot', { position: 'header' }) %>
+
+  <div class="section-header" style="margin-top: 1.5rem;">
+    <div>
+      <h1 class="section-title">
+        Classic Movies from <span style="color: var(--primary);"><%= year %></span>
+      </h1>
+      <p class="section-subtitle">Showing <%= totalCount %> films released in <%= year %></p>
+    </div>
+  </div>
+
+  <% if (movies.length === 0) { %>
+    <div style="text-align: center; padding: 4rem 1rem; background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <h3 style="margin-bottom: 0.5rem;">No films found for <%= year %>.</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Explore other cinematic years or let the automated scheduler discover new titles.</p>
+      <a href="/" class="btn btn-primary">Return to Home</a>
+    </div>
+  <% } else { %>
+    <div class="movies-grid">
+      <% movies.forEach(movie => { %>
+        <%- include('../partials/movieCard', { movie }) %>
+      <% }); %>
+    </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+      <nav class="pagination" aria-label="Year movies pagination">
+        <% if (currentPage > 1) { %>
+          <a href="/year/<%= year %>?page=<%= currentPage - 1 %>" class="page-btn">&larr; Previous</a>
+        <% } %>
+
+        <% for (let p = 1; p <= totalPages; p++) { %>
+          <a href="/year/<%= year %>?page=<%= p %>" class="page-btn <%= p === currentPage ? 'active' : '' %>"><%= p %></a>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+          <a href="/year/<%= year %>?page=<%= currentPage + 1 %>" class="page-btn">Next &rarr;</a>
+        <% } %>
+      </nav>
+    <% } %>
+  <% } %>
+
+  <!-- Footer Ad Placeholder -->
+  <%- include('../partials/adSlot', { position: 'footer' }) %>
+</div>
+
+<%- include('../partials/footer') %>

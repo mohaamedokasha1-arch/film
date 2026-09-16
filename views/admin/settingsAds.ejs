@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ad Placements | CineArchive Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'settingsAds' }) %>
+
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Advertisement & Monetization Slots' }) %>
+
+      <main class="admin-content" style="max-width: 900px;">
+        <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+          <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); padding: 1rem; border-radius: var(--radius-sm); color: #34d399; margin-bottom: 1.5rem;">
+            <%= successMessage %>
+          </div>
+        <% } %>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2rem;">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem;">
+            Configure responsive ad units and scripts (Google AdSense, Media.net, or direct banner codes). Toggle any slot off instantly without modifying source code.
+          </p>
+
+          <form action="/admin/settings/ads" method="POST" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- 1. Header Banner -->
+            <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                  <h3 style="font-size: 1rem; color: #fff;">1. Header Banner (728x90 Leaderboard)</h3>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">Displays directly below top navigation on Home and Movie pages</div>
+                </div>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" name="ad_header_enabled" value="true" <%= siteSettings.ad_header_enabled ? 'checked' : '' %>>
+                  <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">Enabled</span>
+                </label>
+              </div>
+              <textarea name="ad_header_code" class="form-textarea" style="font-family: var(--font-mono); font-size: 0.8rem;"><%= siteSettings.ad_header_code %></textarea>
+            </div>
+
+            <!-- 2. Sidebar Ad -->
+            <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                  <h3 style="font-size: 1rem; color: #fff;">2. Sidebar Ad (300x250 Medium Rectangle)</h3>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">Displays on sidebar layouts and browsing sections</div>
+                </div>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" name="ad_sidebar_enabled" value="true" <%= siteSettings.ad_sidebar_enabled ? 'checked' : '' %>>
+                  <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">Enabled</span>
+                </label>
+              </div>
+              <textarea name="ad_sidebar_code" class="form-textarea" style="font-family: var(--font-mono); font-size: 0.8rem;"><%= siteSettings.ad_sidebar_code %></textarea>
+            </div>
+
+            <!-- 3. In-Content Ad -->
+            <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                  <h3 style="font-size: 1rem; color: #fff;">3. In-Content Ad (Responsive Native)</h3>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">Placed between synopsis and streaming video player</div>
+                </div>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" name="ad_incontent_enabled" value="true" <%= siteSettings.ad_incontent_enabled ? 'checked' : '' %>>
+                  <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">Enabled</span>
+                </label>
+              </div>
+              <textarea name="ad_incontent_code" class="form-textarea" style="font-family: var(--font-mono); font-size: 0.8rem;"><%= siteSettings.ad_incontent_code %></textarea>
+            </div>
+
+            <!-- 4. Footer Banner -->
+            <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                  <h3 style="font-size: 1rem; color: #fff;">4. Footer Banner (728x90)</h3>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">Displays directly above the site footer</div>
+                </div>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" name="ad_footer_enabled" value="true" <%= siteSettings.ad_footer_enabled ? 'checked' : '' %>>
+                  <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">Enabled</span>
+                </label>
+              </div>
+              <textarea name="ad_footer_code" class="form-textarea" style="font-family: var(--font-mono); font-size: 0.8rem;"><%= siteSettings.ad_footer_code %></textarea>
+            </div>
+
+            <div>
+              <button type="submit" class="btn btn-primary">Save Ad Configurations</button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

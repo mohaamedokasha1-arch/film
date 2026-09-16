@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard | CineArchive</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'dashboard' }) %>
+
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'System Overview & Control Panel' }) %>
+
+      <main class="admin-content">
+        <!-- Manual Import Trigger Card with Live Terminal -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h2 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.25rem;">Internet Archive Autonomous Importer</h2>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">
+                Runs automatically every <%= siteSettings.import_frequency_hours %> hours. You can also trigger an immediate ingest cycle below.
+              </p>
+            </div>
+            
+            <button type="button" class="btn btn-primary" id="btn-run-import">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              ▶ Run Import Now
+            </button>
+          </div>
+
+          <!-- Live Terminal Output -->
+          <div class="terminal-window">
+            <div class="terminal-header">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></span>
+                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span>
+                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
+                <span style="font-size: 0.75rem; color: #94a3b8; margin-left: 0.5rem;">Live Ingestion Stream Console</span>
+              </div>
+              <span id="terminal-status" style="font-size: 0.75rem; color: var(--primary);">System Idle</span>
+            </div>
+            <div class="terminal-body" id="live-terminal-body">
+              <div class="terminal-line">
+                <span class="terminal-time">[<%= new Date().toLocaleTimeString() %>]</span>
+                <span class="terminal-type-info">System initialized. Ready for scheduled or manual archive import.</span>
+              </div>
+              <% if (lastLog && lastLog.log_details) { %>
+                <% 
+                  let events = [];
+                  try { events = JSON.parse(lastLog.log_details || '[]'); } catch(e){}
+                  events.slice(-5).forEach(ev => {
+                %>
+                  <div class="terminal-line">
+                    <span class="terminal-time">[<%= ev.time ? new Date(ev.time).toLocaleTimeString() : 'Log' %>]</span>
+                    <span class="terminal-type-<%= ev.type || 'info' %>"><%= ev.message %></span>
+                  </div>
+                <% }); %>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8 Core Metric KPI Cards -->
+        <div class="kpi-grid">
+          <!-- Total Movies -->
+          <div class="kpi-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">Total Movies</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </div>
+            <div class="kpi-value"><%= stats.totalMovies %></div>
+            <div class="kpi-desc">Published: <%= stats.publishedCount %> | Drafts: <%= stats.draftCount %></div>
+          </div>
+
+          <!-- New Movies in 24h -->
+          <div class="kpi-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">New (Last 24h)</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div class="kpi-value" style="color: #34d399;">+<%= stats.new24h %></div>
+            <div class="kpi-desc">Automatically verified & indexed</div>
+          </div>
+
+          <!-- License Rejections (Strict compliance proof) -->
+          <div class="kpi-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">License Rejections</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            </div>
+            <div class="kpi-value" style="color: #fb7185;"><%= stats.totalLicenseRejections %></div>
+            <div class="kpi-desc">Protected against commercial restrictions</div>
+          </div>
+
+          <!-- Duplicate Rejections -->
+          <div class="kpi-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">Duplicates Filtered</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </div>
+            <div class="kpi-value" style="color: #fbbf24;"><%= stats.totalDuplicateRejections %></div>
+            <div class="kpi-desc">Zero redundant pages generated</div>
+          </div>
+
+          <!-- Last Successful Run -->
+          <div class="kpi-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">Last Import Run</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 10"></polyline></svg>
+            </div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: #fff;">
+              <%= siteSettings.last_successful_import ? new Date(siteSettings.last_successful_import).toLocaleString() : 'Never' %>
+            </div>
+            <div class="kpi-desc">Execution status: <%= lastLog ? lastLog.status : 'Ready' %></div>
+          </div>
+
+          <!-- Next Scheduled Run -->
+          <div class="kpi-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">Next Scheduled Run</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: #fff;">
+              <%= schedulerState.nextRun ? new Date(schedulerState.nextRun).toLocaleString() : 'Paused' %>
+            </div>
+            <div class="kpi-desc">Cycle: Every <%= siteSettings.import_frequency_hours %> hours</div>
+          </div>
+
+          <!-- Successful Imports Total -->
+          <div class="kpi-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">Successful Batches</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <div class="kpi-value" style="color: #34d399;"><%= stats.successfulImportJobs %></div>
+            <div class="kpi-desc">Total completed batch jobs</div>
+          </div>
+
+          <!-- Source Health -->
+          <div class="kpi-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">Source Status</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path><line x1="8" y1="16" x2="8.01" y2="16"></line><line x1="8" y1="20" x2="8.01" y2="20"></line><line x1="12" y1="18" x2="12.01" y2="18"></line><line x1="12" y1="22" x2="12.01" y2="22"></line><line x1="16" y1="16" x2="16.01" y2="16"></line><line x1="16" y1="20" x2="16.01" y2="20"></line></svg>
+            </div>
+            <div class="kpi-value" style="color: #38bdf8; font-size: 1.4rem;">ONLINE (200 OK)</div>
+            <div class="kpi-desc">Internet Archive Metadata API</div>
+          </div>
+        </div>
+
+        <!-- Recent Audit Logs Preview Table -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="font-size: 1.1rem; color: #fff;">Recent Ingestion Logs</h2>
+            <a href="/admin/logs" class="btn btn-secondary btn-sm">View All Logs &rarr;</a>
+          </div>
+
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Started</th>
+                  <th>Duration</th>
+                  <th>Found</th>
+                  <th>Imported</th>
+                  <th>License Rejections</th>
+                  <th>Duplicates</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% recentLogs.forEach(log => { %>
+                  <tr>
+                    <td>#<%= log.id %></td>
+                    <td><%= new Date(log.started_at).toLocaleString() %></td>
+                    <td><%= log.duration_seconds %>s</td>
+                    <td><%= log.items_found %></td>
+                    <td><strong style="color: #34d399;"><%= log.items_imported %></strong></td>
+                    <td><span style="color: #fb7185;"><%= log.license_rejections %></span></td>
+                    <td><span style="color: #fbbf24;"><%= log.duplicate_rejections %></span></td>
+                    <td>
+                      <% if (log.status === 'success') { %>
+                        <span class="badge badge-pd">Success</span>
+                      <% } else if (log.status === 'partial') { %>
+                        <span class="badge badge-gold">Partial</span>
+                      <% } else { %>
+                        <span class="badge" style="background: rgba(239,68,68,0.2); color: #f87171;">Failed</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

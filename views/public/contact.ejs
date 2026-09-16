@@ -1,0 +1,82 @@
+<%- include('../partials/header') %>
+
+<div class="container" style="padding: 3rem 1.25rem 5rem; max-width: 860px;">
+  <%- include('../partials/breadcrumbs', { breadcrumbs }) %>
+
+  <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: #ffffff;">Contact & DMCA Compliance</h1>
+  <p style="font-size: 1.05rem; color: var(--text-muted); margin-bottom: 2.5rem;">
+    Direct inquiries, copyright questions, and takedown procedures.
+  </p>
+
+  <% if (typeof submitted !== 'undefined' && submitted) { %>
+    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 2rem; color: #34d399;">
+      <strong>✓ Message Received!</strong> Thank you for contacting our compliance department. We review all inquiries within 24 hours.
+    </div>
+  <% } %>
+
+  <div style="display: grid; grid-template-columns: 1fr; gap: 2.5rem;">
+    <!-- Contact Form -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2rem;">
+      <h2 style="font-size: 1.25rem; margin-bottom: 1rem; color: #ffffff;">Send us a Message</h2>
+      
+      <form action="/contact" method="POST">
+        <div class="form-group">
+          <label class="form-label" for="contact-name">Your Full Name</label>
+          <input type="text" id="contact-name" name="name" class="form-input" required placeholder="Jane Doe">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="contact-email">Email Address</label>
+          <input type="email" id="contact-email" name="email" class="form-input" required placeholder="jane@example.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="contact-subject">Inquiry Subject</label>
+          <select id="contact-subject" name="subject" class="form-select">
+            <option value="general">General Feedback / Inquiry</option>
+            <option value="dmca">DMCA / Copyright Question</option>
+            <option value="licensing">Licensing Verification</option>
+            <option value="advertising">Sponsorship / Advertising</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="contact-message">Message Details</label>
+          <textarea id="contact-message" name="message" class="form-textarea" required placeholder="Please provide specific details or URLs if referring to a particular film listing..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Submit Message
+        </button>
+      </form>
+    </div>
+
+    <!-- Official DMCA Takedown Notice Section -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2rem; color: #d1d5db; line-height: 1.7; font-size: 0.9rem;">
+      <h2 style="font-size: 1.25rem; margin-bottom: 1rem; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        DMCA Notice & Takedown Policy
+      </h2>
+      <p>
+        CineArchive strictly adheres to the provisions of the Digital Millennium Copyright Act (17 U.S.C. § 512) and international intellectual property law. We only index films that our automated validator has verified as Public Domain or licensed under commercial-compatible Creative Commons terms.
+      </p>
+      <p style="margin-top: 0.75rem;">
+        If you are a copyright owner or authorized representative and believe that any work featured on this platform infringes your copyright, please furnish our Designated Agent with the following information:
+      </p>
+      <ol style="margin-left: 1.25rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem;">
+        <li>Identification of the copyrighted work claimed to have been infringed.</li>
+        <li>Specific URL on CineArchive where the disputed content is displayed.</li>
+        <li>Your contact information (name, address, telephone number, and email).</li>
+        <li>A statement that you have a good faith belief that the disputed use is not authorized by the copyright owner, its agent, or the law.</li>
+        <li>A statement made under penalty of perjury that the information in the notification is accurate and that you are authorized to act on behalf of the owner.</li>
+      </ol>
+      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.85rem;">
+        <strong>Designated Compliance Officer:</strong> <%= typeof siteSettings !== 'undefined' ? siteSettings.dmca_agent : 'Copyright Officer' %><br>
+        <strong>Email:</strong> <a href="mailto:<%= typeof siteSettings !== 'undefined' ? siteSettings.contact_email : 'legal@cinearchive.org' %>" style="color: var(--primary);"><%= typeof siteSettings !== 'undefined' ? siteSettings.contact_email : 'legal@cinearchive.org' %></a><br>
+        <strong>SLA:</strong> Valid notices are processed and disputed items removed within 24 business hours.
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

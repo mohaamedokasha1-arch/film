@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>General Settings | CineArchive Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'settingsGeneral' }) %>
+
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'General Site Configuration' }) %>
+
+      <main class="admin-content" style="max-width: 800px;">
+        <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+          <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); padding: 1rem; border-radius: var(--radius-sm); color: #34d399; margin-bottom: 1.5rem;">
+            <%= successMessage %>
+          </div>
+        <% } %>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2rem;">
+          <form action="/admin/settings/general" method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div class="form-group">
+                <label class="form-label">Site Name</label>
+                <input type="text" name="site_name" value="<%= siteSettings.site_name %>" class="form-input" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Tagline</label>
+                <input type="text" name="site_tagline" value="<%= siteSettings.site_tagline %>" class="form-input" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Site Description</label>
+              <textarea name="site_description" class="form-textarea" required><%= siteSettings.site_description %></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div class="form-group">
+                <label class="form-label">Contact & Legal Email</label>
+                <input type="email" name="contact_email" value="<%= siteSettings.contact_email %>" class="form-input" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Designated DMCA Agent Title</label>
+                <input type="text" name="dmca_agent" value="<%= siteSettings.dmca_agent %>" class="form-input" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div class="form-group">
+                <label class="form-label">Movies Per Page (Pagination)</label>
+                <input type="number" name="items_per_page" value="<%= siteSettings.items_per_page %>" class="form-input" min="6" max="60" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Canonical Site URL</label>
+                <input type="url" name="site_url" value="<%= siteSettings.site_url %>" class="form-input" required>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                <input type="checkbox" name="auto_publish" value="true" <%= siteSettings.auto_publish ? 'checked' : '' %>>
+                <span style="font-size: 0.9rem; font-weight: 600; color: #fff;">Enable Instant Auto-Publishing</span>
+              </label>
+              <div class="form-help">When enabled, newly ingested legal movies are published immediately without manual review.</div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+              <button type="submit" class="btn btn-primary">Save General Settings</button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

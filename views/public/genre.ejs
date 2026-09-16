@@ -1,0 +1,66 @@
+<%- include('../partials/header') %>
+
+<div class="container" style="padding: 2.5rem 1.25rem 4rem;">
+  <%- include('../partials/breadcrumbs', { breadcrumbs }) %>
+
+  <!-- Header Ad Placeholder -->
+  <%- include('../partials/adSlot', { position: 'header' }) %>
+
+  <div class="section-header" style="margin-top: 1.5rem;">
+    <div>
+      <h1 class="section-title">
+        <span style="color: var(--primary);"><%= genre.name %></span> Classic Movies
+      </h1>
+      <p class="section-subtitle">Showing <%= totalCount %> verified public domain & open license films</p>
+    </div>
+
+    <!-- Sorting Filter -->
+    <div>
+      <form method="GET" action="/genre/<%= genre.slug %>" style="display: flex; align-items: center; gap: 0.5rem;">
+        <label for="sort-select" style="font-size: 0.8rem; color: var(--text-muted);">Sort by:</label>
+        <select id="sort-select" name="sort" onchange="this.form.submit()" class="form-select" style="width: auto; padding: 0.4rem 0.75rem; font-size: 0.8rem;">
+          <option value="latest" <%= sort === 'latest' ? 'selected' : '' %>>Recently Added</option>
+          <option value="year_desc" <%= sort === 'year_desc' ? 'selected' : '' %>>Year (Newest to Oldest)</option>
+          <option value="year_asc" <%= sort === 'year_asc' ? 'selected' : '' %>>Year (Oldest to Newest)</option>
+          <option value="title" <%= sort === 'title' ? 'selected' : '' %>>Title (A-Z)</option>
+        </select>
+      </form>
+    </div>
+  </div>
+
+  <% if (movies.length === 0) { %>
+    <div style="text-align: center; padding: 4rem 1rem; background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <h3 style="margin-bottom: 0.5rem;">No films found in this genre yet.</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">The automated importer regularly checks for new additions from Internet Archive.</p>
+      <a href="/" class="btn btn-primary">Browse All Movies</a>
+    </div>
+  <% } else { %>
+    <div class="movies-grid">
+      <% movies.forEach(movie => { %>
+        <%- include('../partials/movieCard', { movie }) %>
+      <% }); %>
+    </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+      <nav class="pagination" aria-label="Genre movies pagination">
+        <% if (currentPage > 1) { %>
+          <a href="/genre/<%= genre.slug %>?page=<%= currentPage - 1 %>&sort=<%= sort %>" class="page-btn">&larr; Previous</a>
+        <% } %>
+
+        <% for (let p = 1; p <= totalPages; p++) { %>
+          <a href="/genre/<%= genre.slug %>?page=<%= p %>&sort=<%= sort %>" class="page-btn <%= p === currentPage ? 'active' : '' %>"><%= p %></a>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+          <a href="/genre/<%= genre.slug %>?page=<%= currentPage + 1 %>&sort=<%= sort %>" class="page-btn">Next &rarr;</a>
+        <% } %>
+      </nav>
+    <% } %>
+  <% } %>
+
+  <!-- Footer Ad Placeholder -->
+  <%- include('../partials/adSlot', { position: 'footer' }) %>
+</div>
+
+<%- include('../partials/footer') %>

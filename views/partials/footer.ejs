@@ -1,0 +1,72 @@
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand-logo" style="margin-bottom: 0.85rem;">
+            <div class="brand-icon" style="width: 1.85rem; height: 1.85rem; font-size: 0.8rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </div>
+            <span><%= typeof siteSettings !== 'undefined' && siteSettings.site_name ? siteSettings.site_name : 'CineArchive' %></span>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem;">
+            An automated preservation and distribution portal for verified public domain masterpieces, silent cinema, and Creative Commons heritage films. Powered by open metadata from the Internet Archive.
+          </p>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="badge badge-pd">Public Domain</span>
+            <span class="badge badge-cc">Open Culture</span>
+            <span class="badge badge-gold">Auto-Updating</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>Legal & Policy</h5>
+          <ul class="footer-links">
+            <li><a href="/about">About & Mission</a></li>
+            <li><a href="/contact">DMCA & Copyright Takedowns</a></li>
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+            <li><a href="/terms-of-service">Terms of Service</a></li>
+            <li><a href="/sitemap">HTML Sitemap</a></li>
+            <li><a href="/sitemap.xml" target="_blank">XML Sitemap (SEO)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Popular Genres</h5>
+          <ul class="footer-links">
+            <li><a href="/genre/comedy">Comedy Classics</a></li>
+            <li><a href="/genre/silent">Silent Masterworks</a></li>
+            <li><a href="/genre/sci-fi">Vintage Sci-Fi</a></li>
+            <li><a href="/genre/horror">Classic Horror</a></li>
+            <li><a href="/genre/drama">Golden Age Drama</a></li>
+            <li><a href="/genre/film-noir">Film Noir</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Golden Eras</h5>
+          <ul class="footer-links">
+            <li><a href="/year/1920">1920s Silent Era</a></li>
+            <li><a href="/year/1938">1930s Pre-War Cinema</a></li>
+            <li><a href="/year/1942">1940s Wartime Treasures</a></li>
+            <li><a href="/year/1959">1950s Sci-Fi & Noir</a></li>
+            <li><a href="/year/1968">1960s Cult Classics</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; <%= new Date().getFullYear() %> <%= typeof siteSettings !== 'undefined' && siteSettings.site_name ? siteSettings.site_name : 'CineArchive' %>. Dedicated to cultural preservation.
+        </div>
+        <div style="display: flex; gap: 1.25rem;">
+          <span>Original Metadata: <a href="https://archive.org" target="_blank" rel="noopener" style="color: var(--primary); text-decoration: underline;">Internet Archive</a></span>
+          <span>•</span>
+          <span>Clean URLs & Schema.org JSON-LD</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

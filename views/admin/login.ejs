@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login | CineArchive</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body style="background: var(--bg-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+  <div style="width: 100%; max-width: 420px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2.5rem; box-shadow: var(--shadow-lg);">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div class="brand-icon" style="width: 3rem; height: 3rem; margin: 0 auto 1rem; font-size: 1.25rem;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+      </div>
+      <h1 style="font-size: 1.5rem; font-weight: 800; color: #fff;">CineArchive Admin</h1>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem;">Enter credentials to access the compliance dashboard</p>
+    </div>
+
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: var(--radius-sm); padding: 0.75rem 1rem; color: #f87171; font-size: 0.85rem; margin-bottom: 1.5rem;">
+        <%= errorMessage %>
+      </div>
+    <% } %>
+
+    <form action="/admin/login" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="username">Username</label>
+        <input type="text" id="username" name="username" class="form-input" required value="admin" autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-input" required value="admin123" autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.75rem;">
+        Sign In to Admin
+      </button>
+
+      <div style="margin-top: 1.5rem; padding: 0.75rem; background: var(--bg-surface-elevated); border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-dim); text-align: center;">
+        Default Credentials: <strong style="color: #fff;">admin</strong> / <strong style="color: #fff;">admin123</strong>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

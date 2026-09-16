@@ -1,0 +1,69 @@
+<%- include('../partials/header') %>
+
+<div class="container" style="padding: 3rem 1.25rem 5rem;">
+  <%- include('../partials/breadcrumbs', { breadcrumbs }) %>
+
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">HTML Sitemap</h1>
+      <p class="section-subtitle">Complete navigational directory of all public pages and cataloged movies</p>
+    </div>
+    <a href="/sitemap.xml" target="_blank" class="btn btn-secondary btn-sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      View XML Sitemap (For Crawlers)
+    </a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 2rem;">
+    <!-- Main Pages -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+      <h2 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Main Pages</h2>
+      <ul class="footer-links">
+        <li><a href="/">Homepage</a></li>
+        <li><a href="/search">Browse & Search Catalog</a></li>
+        <li><a href="/about">About & Legal Mission</a></li>
+        <li><a href="/contact">Contact & DMCA Takedown</a></li>
+        <li><a href="/privacy-policy">Privacy Policy</a></li>
+        <li><a href="/terms-of-service">Terms of Service</a></li>
+      </ul>
+    </div>
+
+    <!-- Genres -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+      <h2 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Movie Genres (<%= genres.length %>)</h2>
+      <ul class="footer-links" style="max-height: 250px; overflow-y: auto;">
+        <% genres.forEach(g => { %>
+          <li><a href="/genre/<%= g.slug %>"><%= g.name %> (<%= g.movie_count %>)</a></li>
+        <% }); %>
+      </ul>
+    </div>
+
+    <!-- Years -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+      <h2 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Release Eras (<%= years.length %>)</h2>
+      <ul class="footer-links" style="max-height: 250px; overflow-y: auto;">
+        <% years.forEach(y => { %>
+          <li><a href="/year/<%= y.year %>"><%= y.year %> (<%= y.count %>)</a></li>
+        <% }); %>
+      </ul>
+    </div>
+  </div>
+
+  <!-- All Movies Alphabetical List -->
+  <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2rem; margin-top: 2.5rem;">
+    <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+      Indexed Movies Directory (<%= movies.length %>)
+    </h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem;">
+      <% movies.forEach(m => { %>
+        <div>
+          <a href="/movie/<%= m.slug %>" style="color: var(--text-muted); font-size: 0.875rem;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+            <%= m.title %> <%= m.year ? '(' + m.year + ')' : '' %>
+          </a>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

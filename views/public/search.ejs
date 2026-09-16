@@ -1,0 +1,109 @@
+<%- include('../partials/header') %>
+
+<div class="container" style="padding: 2.5rem 1.25rem 4rem;">
+  <%- include('../partials/breadcrumbs', { breadcrumbs }) %>
+
+  <!-- Search Header Form -->
+  <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2.5rem;">
+    <h1 style="font-size: 1.75rem; margin-bottom: 1rem;">Search Classic Catalog</h1>
+    
+    <form action="/search" method="GET" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+      <div style="display: flex; gap: 0.75rem;">
+        <input 
+          type="text" 
+          name="q" 
+          value="<%= searchQuery %>" 
+          placeholder="Search by movie title, director, actor, or keyword..." 
+          class="form-input" 
+          style="font-size: 1rem; padding: 0.75rem 1rem;"
+          autofocus
+        >
+        <button type="submit" class="btn btn-primary" style="padding: 0 1.5rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          Search
+        </button>
+      </div>
+
+      <!-- Filters Row -->
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">Genre:</label>
+          <select name="genre" class="form-select" style="width: auto; padding: 0.4rem 0.75rem; font-size: 0.8rem;">
+            <option value="">All Genres</option>
+            <% genres.forEach(g => { %>
+              <option value="<%= g.slug %>" <%= selectedGenre === g.slug ? 'selected' : '' %>><%= g.name %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">Era / Year:</label>
+          <select name="year" class="form-select" style="width: auto; padding: 0.4rem 0.75rem; font-size: 0.8rem;">
+            <option value="">All Years</option>
+            <% years.forEach(y => { %>
+              <option value="<%= y.year %>" <%= selectedYear == y.year ? 'selected' : '' %>><%= y.year %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <% if (searchQuery || selectedGenre || selectedYear) { %>
+          <a href="/search" class="btn btn-secondary btn-sm" style="color: var(--accent-rose);">Clear Filters</a>
+        <% } %>
+      </div>
+    </form>
+  </div>
+
+  <!-- Search Results Count -->
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">
+        <% if (searchQuery) { %>
+          Results for "<%= searchQuery %>"
+        <% } else { %>
+          All Indexed Films
+        <% } %>
+      </h2>
+      <p class="section-subtitle">Found <%= totalCount %> matching legal public domain titles</p>
+    </div>
+  </div>
+
+  <% if (movies.length === 0) { %>
+    <div style="text-align: center; padding: 4rem 1.5rem; background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="1.5" style="margin-bottom: 1rem;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <h3 style="margin-bottom: 0.5rem;">No films matched your query.</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 480px; margin-left: auto; margin-right: auto;">
+        Try using broader keywords, checking for spelling variations, or clearing active genre and year filters.
+      </p>
+      <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/genre/comedy" class="btn btn-secondary btn-sm">Browse Comedies</a>
+        <a href="/genre/silent" class="btn btn-secondary btn-sm">Browse Silent Films</a>
+        <a href="/genre/horror" class="btn btn-secondary btn-sm">Browse Horror</a>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="movies-grid">
+      <% movies.forEach(movie => { %>
+        <%- include('../partials/movieCard', { movie }) %>
+      <% }); %>
+    </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+      <nav class="pagination" aria-label="Search pagination">
+        <% if (currentPage > 1) { %>
+          <a href="/search?q=<%= encodeURIComponent(searchQuery) %>&genre=<%= selectedGenre %>&year=<%= selectedYear %>&page=<%= currentPage - 1 %>" class="page-btn">&larr; Previous</a>
+        <% } %>
+
+        <% for (let p = 1; p <= totalPages; p++) { %>
+          <a href="/search?q=<%= encodeURIComponent(searchQuery) %>&genre=<%= selectedGenre %>&year=<%= selectedYear %>&page=<%= p %>" class="page-btn <%= p === currentPage ? 'active' : '' %>"><%= p %></a>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+          <a href="/search?q=<%= encodeURIComponent(searchQuery) %>&genre=<%= selectedGenre %>&year=<%= selectedYear %>&page=<%= currentPage + 1 %>" class="page-btn">Next &rarr;</a>
+        <% } %>
+      </nav>
+    <% } %>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

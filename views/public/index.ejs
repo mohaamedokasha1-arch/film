@@ -1,0 +1,162 @@
+<%- include('../partials/header') %>
+
+<!-- Header Ad Placeholder -->
+<div class="container">
+  <%- include('../partials/adSlot', { position: 'header' }) %>
+</div>
+
+<!-- Hero Section -->
+<section class="hero-banner">
+  <div class="container hero-inner">
+    <div>
+      <div class="hero-tagline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        100% Legal Public Domain & Open Culture Cinema
+      </div>
+      <h1 class="hero-title">
+        The Golden Age of Film, <br><span class="gradient-text">Freely Preserved Forever.</span>
+      </h1>
+      <p class="hero-desc">
+        Stream hundreds of fully verified public domain masterpieces, silent cinema legends, vintage horror, slapstick comedies, and historic cinema treasures. No subscriptions, no manual uploads, completely legal.
+      </p>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="#latest-movies" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Explore Latest Movies
+        </a>
+        <a href="/about" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          Our Legal Guarantee
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <h4><%= totalMovies %>+</h4>
+          <p>Verified Movies</p>
+        </div>
+        <div class="stat-item">
+          <h4><%= genres.length %></h4>
+          <p>Curated Genres</p>
+        </div>
+        <div class="stat-item">
+          <h4>100%</h4>
+          <p>Public Domain / CC</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured Movie Card -->
+    <% if (featuredMovie) { %>
+      <div class="hero-featured-card">
+        <div class="featured-poster-wrap">
+          <img src="<%= featuredMovie.poster_url || '/images/placeholder-poster.svg' %>" alt="<%= featuredMovie.title %> poster">
+        </div>
+        <div class="featured-content">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span class="badge badge-gold">★ FEATURED CLASSIC</span>
+            <span class="badge badge-pd"><%= featuredMovie.license_type %></span>
+          </div>
+          <h2 style="font-size: 1.35rem; margin-bottom: 0.5rem;"><%= featuredMovie.title %></h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            <%= featuredMovie.description %>
+          </p>
+          <a href="/movie/<%= featuredMovie.slug %>" class="btn btn-primary" style="width: 100%;">
+            Watch Now Free
+          </a>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- Browse by Genre Cloud -->
+<section class="container" style="margin-top: 3rem;">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Browse by Genre
+      </h2>
+      <p class="section-subtitle">Discover historical cinematic genres curated automatically</p>
+    </div>
+  </div>
+  <div class="genres-pill-cloud">
+    <% genres.forEach(g => { %>
+      <a href="/genre/<%= g.slug %>" class="genre-pill">
+        <span><%= g.name %></span>
+        <span class="count"><%= g.movie_count %></span>
+      </a>
+    <% }); %>
+  </div>
+</section>
+
+<!-- In-Content Ad Placeholder -->
+<div class="container">
+  <%- include('../partials/adSlot', { position: 'incontent' }) %>
+</div>
+
+<!-- Latest Movies Grid -->
+<section class="container" id="latest-movies" style="margin-top: 2rem;">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        Latest Verified Additions
+      </h2>
+      <p class="section-subtitle">Freshly ingested and legal-checked films from the archive</p>
+    </div>
+    <a href="/search" class="btn btn-secondary btn-sm">View Full Catalog &rarr;</a>
+  </div>
+
+  <div class="movies-grid">
+    <% movies.forEach(movie => { %>
+      <%- include('../partials/movieCard', { movie }) %>
+    <% }); %>
+  </div>
+
+  <!-- Pagination -->
+  <% if (totalPages > 1) { %>
+    <nav class="pagination" aria-label="Movies pagination">
+      <% if (currentPage > 1) { %>
+        <a href="/?page=<%= currentPage - 1 %>" class="page-btn">&larr; Previous</a>
+      <% } %>
+
+      <% for (let p = 1; p <= totalPages; p++) { %>
+        <a href="/?page=<%= p %>" class="page-btn <%= p === currentPage ? 'active' : '' %>"><%= p %></a>
+      <% } %>
+
+      <% if (currentPage < totalPages) { %>
+        <a href="/?page=<%= currentPage + 1 %>" class="page-btn">Next &rarr;</a>
+      <% } %>
+    </nav>
+  <% } %>
+</section>
+
+<!-- Browse by Era / Decades -->
+<section class="container" style="margin-top: 3rem; margin-bottom: 3rem;">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Browse by Golden Era
+      </h2>
+      <p class="section-subtitle">Chronological exploration of cinema milestones</p>
+    </div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
+    <% years.forEach(y => { %>
+      <a href="/year/<%= y.year %>" class="btn btn-secondary" style="justify-content: space-between; padding: 0.85rem 1rem;">
+        <span style="font-weight: 700; color: #ffffff;"><%= y.year %></span>
+        <span class="badge badge-gold"><%= y.count %> <%= y.count === 1 ? 'Film' : 'Films' %></span>
+      </a>
+    <% }); %>
+  </div>
+</section>
+
+<!-- Footer Ad Placeholder -->
+<div class="container">
+  <%- include('../partials/adSlot', { position: 'footer' }) %>
+</div>
+
+<%- include('../partials/footer') %>

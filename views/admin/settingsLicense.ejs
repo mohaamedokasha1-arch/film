@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>License Rules | CineArchive Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'settingsLicense' }) %>
+
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Strict License & Legal Compliance Rules' }) %>
+
+      <main class="admin-content" style="max-width: 800px;">
+        <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+          <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); padding: 1rem; border-radius: var(--radius-sm); color: #34d399; margin-bottom: 1.5rem;">
+            <%= successMessage %>
+          </div>
+        <% } %>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2rem;">
+          <form action="/admin/settings/license" method="POST">
+            <h3 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.5rem;">Permitted Licenses (Commercial Use & Ad Monetization Compatible)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+              Only items matching one of these enabled licenses will be published. Any non-commercial restriction or ambiguous status is automatically rejected.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+              <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; background: var(--bg-surface-elevated); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                <input type="checkbox" name="license_allow_public_domain" value="true" <%= siteSettings.license_allow_public_domain ? 'checked' : '' %> style="margin-top: 0.25rem;">
+                <div>
+                  <div style="font-weight: 700; color: #34d399;">Public Domain (Recommended)</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    Works free of copyright restrictions worldwide, expired US copyrights, and Public Domain Mark 1.0 items.
+                  </div>
+                </div>
+              </label>
+
+              <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; background: var(--bg-surface-elevated); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                <input type="checkbox" name="license_allow_cc0" value="true" <%= siteSettings.license_allow_cc0 ? 'checked' : '' %> style="margin-top: 0.25rem;">
+                <div>
+                  <div style="font-weight: 700; color: #60a5fa;">Creative Commons CC0 1.0 Universal</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    Worldwide public domain dedication. Completely unrestricted commercial use and redistribution without mandatory attribution.
+                  </div>
+                </div>
+              </label>
+
+              <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; background: var(--bg-surface-elevated); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                <input type="checkbox" name="license_allow_cc_by" value="true" <%= siteSettings.license_allow_cc_by ? 'checked' : '' %> style="margin-top: 0.25rem;">
+                <div>
+                  <div style="font-weight: 700; color: #fbbf24;">Creative Commons Attribution (CC BY)</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    Permits commercial use and ad monetization provided that author attribution is displayed. CineArchive automatically generates the attribution block.
+                  </div>
+                </div>
+              </label>
+
+              <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; background: var(--bg-surface-elevated); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                <input type="checkbox" name="license_allow_cc_by_sa" value="true" <%= siteSettings.license_allow_cc_by_sa ? 'checked' : '' %> style="margin-top: 0.25rem;">
+                <div>
+                  <div style="font-weight: 700; color: #a78bfa;">Creative Commons Attribution-ShareAlike (CC BY-SA)</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    Permits commercial distribution and remixing as long as derivatives are released under identical terms.
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <h3 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.5rem;">Public Domain Era Cutoff Rule</h3>
+            <div class="form-group">
+              <label class="form-label">Pre-1929 US Public Domain Threshold Year</label>
+              <input type="number" name="public_domain_cutoff_year" value="<%= siteSettings.public_domain_cutoff_year %>" class="form-input" style="max-width: 200px;" required>
+              <div class="form-help">Works published in the United States prior to this year are definitively in the worldwide Public Domain.</div>
+            </div>
+
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); padding: 1rem; margin-top: 1.5rem;">
+              <div style="font-weight: 700; color: #f87171; font-size: 0.85rem; margin-bottom: 0.3rem;">Strictly Prohibited & Auto-Rejected:</div>
+              <ul style="font-size: 0.8rem; color: #fca5a5; margin-left: 1.25rem; display: flex; flex-direction: column; gap: 0.25rem;">
+                <li>CC BY-NC, CC BY-NC-SA, CC BY-NC-ND (Non-Commercial licenses)</li>
+                <li>All Rights Reserved / Copyrighted media</li>
+                <li>Items with unverified, unknown, or missing rights statements</li>
+              </ul>
+            </div>
+
+            <div style="margin-top: 2rem;">
+              <button type="submit" class="btn btn-primary">Save License Configuration</button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

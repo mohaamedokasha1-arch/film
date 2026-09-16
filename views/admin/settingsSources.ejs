@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Source Settings | CineArchive Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'settingsSources' }) %>
+
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Internet Archive Source Configuration' }) %>
+
+      <main class="admin-content" style="max-width: 800px;">
+        <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+          <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); padding: 1rem; border-radius: var(--radius-sm); color: #34d399; margin-bottom: 1.5rem;">
+            <%= successMessage %>
+          </div>
+        <% } %>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2rem;">
+          <form action="/admin/settings/sources" method="POST">
+            <div class="form-group">
+              <label class="form-label">Primary Source Provider</label>
+              <input type="text" class="form-input" value="Internet Archive (https://archive.org)" disabled>
+              <div class="form-help">Official Metadata & Advanced Search Public JSON APIs. Completely free, no API keys required.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Target Collections (Comma Separated)</label>
+              <input type="text" name="archive_search_collections" value="<%= siteSettings.archive_search_collections %>" class="form-input" required>
+              <div class="form-help">Available collections: feature_films, silent_films, Comedy_Films, classic_tv, scifi_horror, Film_Noir</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div class="form-group">
+                <label class="form-label">Candidate Rows per Cycle</label>
+                <input type="number" name="archive_rows_per_import" value="<%= siteSettings.archive_rows_per_import %>" class="form-input" min="5" max="100" required>
+                <div class="form-help">Number of items fetched from the source per cycle (10-30 recommended).</div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Automated Schedule Interval (Hours)</label>
+                <input type="number" name="import_frequency_hours" value="<%= siteSettings.import_frequency_hours %>" class="form-input" min="1" max="168" required>
+                <div class="form-help">Frequency between automated background ingestion runs (Default: 6h).</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Sort Criteria</label>
+              <select name="archive_sort_order" class="form-select">
+                <option value="downloads desc" <%= siteSettings.archive_sort_order === 'downloads desc' ? 'selected' : '' %>>Highest Downloads First (Popular Classics)</option>
+                <option value="publicdate desc" <%= siteSettings.archive_sort_order === 'publicdate desc' ? 'selected' : '' %>>Newest Preservations First</option>
+                <option value="addeddate desc" <%= siteSettings.archive_sort_order === 'addeddate desc' ? 'selected' : '' %>>Recently Added to Archive</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                <input type="checkbox" name="scheduler_enabled" value="true" <%= siteSettings.scheduler_enabled ? 'checked' : '' %>>
+                <span style="font-size: 0.9rem; font-weight: 600; color: #fff;">Enable Automated Background Scheduler</span>
+              </label>
+              <div class="form-help">If disabled, ingestion only occurs when "Run Import Now" is clicked manually.</div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+              <button type="submit" class="btn btn-primary">Save Source Settings</button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

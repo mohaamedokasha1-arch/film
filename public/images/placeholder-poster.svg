@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141824"/>
+      <stop offset="50%" stop-color="#0f111a"/>
+      <stop offset="100%" stop-color="#07080c"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="450" fill="url(#bg)"/>
+  <rect x="15" y="15" width="270" height="420" rx="8" fill="none" stroke="#22283a" stroke-width="2" stroke-dasharray="6,6"/>
+  
+  <!-- Film Reel Graphic -->
+  <g transform="translate(150, 190)">
+    <circle r="60" fill="none" stroke="url(#gold)" stroke-width="8" opacity="0.85"/>
+    <circle r="48" fill="#171b26" stroke="#2a3348" stroke-width="2"/>
+    <circle r="18" fill="url(#gold)"/>
+    <circle r="8" fill="#0f111a"/>
+    <circle cx="0" cy="-33" r="7" fill="#0f111a"/>
+    <circle cx="28" cy="-16" r="7" fill="#0f111a"/>
+    <circle cx="28" cy="16" r="7" fill="#0f111a"/>
+    <circle cx="0" cy="33" r="7" fill="#0f111a"/>
+    <circle cx="-28" cy="16" r="7" fill="#0f111a"/>
+    <circle cx="-28" cy="-16" r="7" fill="#0f111a"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="150" y="295" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#f3f4f6" text-anchor="middle" letter-spacing="1">CINEARCHIVE</text>
+  <text x="150" y="322" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="500" fill="#9ca3af" text-anchor="middle" letter-spacing="0.5">PUBLIC DOMAIN CINEMA</text>
+  <rect x="85" y="342" width="130" height="24" rx="12" fill="#202637"/>
+  <text x="150" y="358" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#d1d5db" text-anchor="middle" letter-spacing="0.5">VERIFIED LEGAL</text>
+</svg>

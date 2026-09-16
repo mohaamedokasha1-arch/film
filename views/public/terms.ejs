@@ -1,0 +1,40 @@
+<%- include('../partials/header') %>
+
+<div class="container" style="padding: 3rem 1.25rem 5rem; max-width: 860px;">
+  <%- include('../partials/breadcrumbs', { breadcrumbs }) %>
+
+  <h1 style="font-size: 2.25rem; margin-bottom: 0.5rem; color: #ffffff;">Terms of Service</h1>
+  <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem;">Last Updated: September 16, 2026</p>
+
+  <div style="color: #d1d5db; line-height: 1.8; font-size: 0.95rem; display: flex; flex-direction: column; gap: 1.5rem;">
+    <section>
+      <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 0.5rem;">1. Acceptance of Terms</h2>
+      <p>
+        By accessing and browsing <%= siteSettings.site_name %>, you acknowledge and agree to comply with these Terms of Service. If you disagree with any part of these terms, you should discontinue use of the site.
+      </p>
+    </section>
+
+    <section>
+      <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 0.5rem;">2. Intellectual Property & Public Domain Content</h2>
+      <p>
+        The cinematic works cataloged on <%= siteSettings.site_name %> are verified to be in the <strong>Public Domain</strong> or published under applicable open licenses (e.g. Creative Commons CC0, CC BY). You are free to view and enjoy these works. For films requiring attribution under CC BY licenses, the required attribution notice is prominently displayed on the respective movie page.
+      </p>
+    </section>
+
+    <section>
+      <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 0.5rem;">3. Disclaimer of Warranties</h2>
+      <p>
+        This website, its software, and cataloged metadata are provided on an "as is" and "as available" basis without warranties of any kind. While every reasonable effort is made to maintain accurate license validation and uptime, we make no guarantees regarding uninterrupted streaming or the permanent availability of third-party digital repositories.
+      </p>
+    </section>
+
+    <section>
+      <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 0.5rem;">4. Limitation of Liability</h2>
+      <p>
+        In no event shall <%= siteSettings.site_name %>, its administrators, or contributors be held liable for any damages arising out of your use or inability to use this service.
+      </p>
+    </section>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

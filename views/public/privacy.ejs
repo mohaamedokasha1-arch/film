@@ -1,0 +1,43 @@
+<%- include('../partials/header') %>
+
+<div class="container" style="padding: 3rem 1.25rem 5rem; max-width: 860px;">
+  <%- include('../partials/breadcrumbs', { breadcrumbs }) %>
+
+  <h1 style="font-size: 2.25rem; margin-bottom: 0.5rem; color: #ffffff;">Privacy Policy</h1>
+  <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem;">Effective Date: September 16, 2026</p>
+
+  <div style="color: #d1d5db; line-height: 1.8; font-size: 0.95rem; display: flex; flex-direction: column; gap: 1.5rem;">
+    <section>
+      <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 0.5rem;">1. Information We Collect</h2>
+      <p>
+        <%= siteSettings.site_name %> respects visitor privacy. We do not require account registration or collect personal identifying information (PII) to stream movies. When you browse the website, our servers automatically log anonymous connection data including IP address, user-agent, operating system, pages visited, and timestamps.
+      </p>
+    </section>
+
+    <section>
+      <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 0.5rem;">2. Cookies and Third-Party Advertising</h2>
+      <p>
+        This site uses cookies to ensure optimal performance, analyze traffic, and display relevant commercial advertisements (such as Google AdSense or programmatic advertising partners).
+      </p>
+      <p style="margin-top: 0.5rem;">
+        Third-party ad vendors, including Google, use cookies to serve ads based on a user's prior visits to this website or other websites. You may opt out of personalized advertising by visiting Google's Ads Settings or <a href="https://www.aboutads.info" target="_blank" rel="noopener" style="color: var(--primary);">www.aboutads.info</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 0.5rem;">3. External Links & Media Providers</h2>
+      <p>
+        Video streams and metadata are embedded from the Internet Archive (archive.org). When you interact with third-party embedded players, those platforms may place their own cookies in accordance with their respective privacy policies.
+      </p>
+    </section>
+
+    <section>
+      <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 0.5rem;">4. GDPR & CCPA Compliance</h2>
+      <p>
+        Visitors from the European Economic Area (EEA) and California retain rights to inquire about, request deletion of, or restrict processing of their access logs by contacting <a href="mailto:<%= siteSettings.contact_email %>" style="color: var(--primary);"><%= siteSettings.contact_email %></a>.
+      </p>
+    </section>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

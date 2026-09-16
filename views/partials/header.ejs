@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'CineArchive - Watch Free Legal Public Domain Classic Movies' %></title>
+  <% if (typeof metaDescription !== 'undefined') { %>
+    <meta name="description" content="<%= metaDescription %>">
+  <% } %>
+  <% if (typeof canonicalUrl !== 'undefined') { %>
+    <link rel="canonical" href="<%= canonicalUrl %>">
+  <% } %>
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="<%= typeof ogType !== 'undefined' ? ogType : 'website' %>">
+  <meta property="og:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : 'CineArchive' %>">
+  <% if (typeof metaDescription !== 'undefined') { %>
+    <meta property="og:description" content="<%= metaDescription %>">
+  <% } %>
+  <meta property="og:image" content="<%= typeof ogImage !== 'undefined' ? ogImage : '/images/placeholder-poster.svg' %>">
+  <% if (typeof canonicalUrl !== 'undefined') { %>
+    <meta property="og:url" content="<%= canonicalUrl %>">
+  <% } %>
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle : 'CineArchive' %>">
+  <% if (typeof metaDescription !== 'undefined') { %>
+    <meta name="twitter:description" content="<%= metaDescription %>">
+  <% } %>
+  <meta name="twitter:image" content="<%= typeof ogImage !== 'undefined' ? ogImage : '/images/placeholder-poster.svg' %>">
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <% if (typeof jsonLdSchema !== 'undefined' && jsonLdSchema) { %>
+    <script type="application/ld+json">
+      <%- jsonLdSchema %>
+    </script>
+  <% } %>
+
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/images/placeholder-poster.svg">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-logo">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </div>
+        <span><%= typeof siteSettings !== 'undefined' && siteSettings.site_name ? siteSettings.site_name : 'CineArchive' %></span>
+        <span class="brand-badge">100% LEGAL</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'home' ? 'active' : '' %>">Home</a></li>
+          <li><a href="/search" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'movies' ? 'active' : '' %>">Browse</a></li>
+          <li><a href="/genre/comedy" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'genres' ? 'active' : '' %>">Genres</a></li>
+          <li><a href="/about" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'about' ? 'active' : '' %>">About</a></li>
+          <li><a href="/contact" class="nav-link <%= typeof activeNav !== 'undefined' && activeNav === 'contact' ? 'active' : '' %>">DMCA & Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-search">
+        <form action="/search" method="GET" class="search-form">
+          <span class="search-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </span>
+          <input type="text" name="q" class="search-input" placeholder="Search classics, directors, years... (Press /)" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" autocomplete="off">
+        </form>
+      </div>
+
+      <a href="/admin" class="btn btn-secondary btn-sm" title="Admin Dashboard">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        Admin
+      </a>
+    </div>
+  </header>

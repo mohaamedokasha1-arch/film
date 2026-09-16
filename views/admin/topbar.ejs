@@ -1,0 +1,27 @@
+<header class="admin-topbar">
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <h1 style="font-size: 1.25rem; font-weight: 700; color: #fff;"><%= pageTitle %></h1>
+    <% if (schedulerState && schedulerState.isRunning) { %>
+      <span class="badge badge-pd" title="Scheduler is actively polling every <%= siteSettings.import_frequency_hours %> hours">
+        ● SCHEDULER ACTIVE
+      </span>
+    <% } else { %>
+      <span class="badge" style="background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);">
+        ○ SCHEDULER PAUSED
+      </span>
+    <% } %>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 1.25rem;">
+    <% if (schedulerState && schedulerState.nextRun) { %>
+      <div style="font-size: 0.8rem; color: var(--text-dim); display: none; @media(min-width: 768px){display: block;}">
+        Next run: <strong style="color: #d1d5db;"><%= new Date(schedulerState.nextRun).toLocaleTimeString() %></strong>
+      </div>
+    <% } %>
+    
+    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #d1d5db; background: var(--bg-surface-elevated); padding: 0.35rem 0.85rem; border-radius: var(--radius-full); border: 1px solid var(--border-color);">
+      <div style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></div>
+      <span><%= adminUser ? adminUser.username : 'Administrator' %></span>
+    </div>
+  </div>
+</header>

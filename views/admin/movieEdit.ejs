@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Movie | CineArchive Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'movies' }) %>
+
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Emergency Edit: ' + movie.title }) %>
+
+      <main class="admin-content" style="max-width: 900px;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2rem;">
+          <form action="/admin/movies/<%= movie.id %>/edit" method="POST">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+              <div class="form-group">
+                <label class="form-label">Movie Title</label>
+                <input type="text" name="title" value="<%= movie.title %>" class="form-input" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Release Year</label>
+                <input type="number" name="year" value="<%= movie.year %>" class="form-input">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">URL Slug (Unique)</label>
+              <input type="text" name="slug" value="<%= movie.slug %>" class="form-input" required>
+              <div class="form-help">Public path: /movie/<%= movie.slug %></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description / Synopsis</label>
+              <textarea name="description" class="form-textarea" style="min-height: 140px;"><%= movie.description %></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div class="form-group">
+                <label class="form-label">Director</label>
+                <input type="text" name="director" value="<%= movie.director %>" class="form-input">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Duration (Minutes)</label>
+                <input type="number" name="duration" value="<%= movie.duration %>" class="form-input">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div class="form-group">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                  <option value="published" <%= movie.status === 'published' ? 'selected' : '' %>>Published</option>
+                  <option value="draft" <%= movie.status === 'draft' ? 'selected' : '' %>>Draft</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Verified License Type</label>
+                <input type="text" name="license_type" value="<%= movie.license_type %>" class="form-input">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Poster Image URL</label>
+              <input type="url" name="poster_url" value="<%= movie.poster_url %>" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Archive Embed URL</label>
+              <input type="url" name="embed_url" value="<%= movie.embed_url %>" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Required Attribution Statement</label>
+              <input type="text" name="attribution_text" value="<%= movie.attribution_text %>" class="form-input">
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+              <a href="/admin/movies" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

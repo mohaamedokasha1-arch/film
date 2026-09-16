@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rejected & Failed Items | CineArchive Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'failed' }) %>
+
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'License Rejections & Failed Ingestions' }) %>
+
+      <main class="admin-content">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.25rem;">Automated Compliance Gatekeeper</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Items listed here were rejected during ingestion to ensure 100% legal compliance. You can permanently ignore an item to stop future retry evaluations or manually re-test it.
+          </p>
+        </div>
+
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Identifier</th>
+                <th>Title</th>
+                <th>Failure / Rejection Reason</th>
+                <th>License Issue?</th>
+                <th>Ignored?</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (items.length === 0) { %>
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                    No rejected or failed items recorded. All evaluated candidates met legal criteria!
+                  </td>
+                </tr>
+              <% } %>
+              <% items.forEach(item => { %>
+                <tr>
+                  <td>
+                    <a href="https://archive.org/details/<%= item.external_id %>" target="_blank" rel="noopener" style="font-family: var(--font-mono); color: var(--primary); font-size: 0.8rem;">
+                      <%= item.external_id %>
+                    </a>
+                  </td>
+                  <td><strong><%= item.title || 'Untitled' %></strong></td>
+                  <td>
+                    <span style="color: #f87171; font-size: 0.85rem;"><%= item.failure_reason %></span>
+                  </td>
+                  <td>
+                    <% if (item.license_issue) { %>
+                      <span class="badge" style="background: rgba(239,68,68,0.2); color: #f87171;">License Violation</span>
+                    <% } else { %>
+                      <span class="badge" style="background: rgba(245,158,11,0.2); color: #fbbf24;">Format Error</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (item.permanently_ignored) { %>
+                      <span class="badge" style="background: rgba(107,114,128,0.2); color: #9ca3af;">Ignored</span>
+                    <% } else { %>
+                      <span style="color: var(--text-dim); font-size: 0.8rem;">Active</span>
+                    <% } %>
+                  </td>
+                  <td style="text-align: right;">
+                    <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                      <form action="/admin/failed/<%= item.id %>/toggle-ignore" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-secondary btn-sm">
+                          <%= item.permanently_ignored ? 'Un-ignore' : 'Ignore Permanently' %>
+                        </button>
+                      </form>
+                      <form action="/admin/failed/<%= item.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Remove this failure record?');">
+                        <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--accent-rose);">
+                          Delete
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

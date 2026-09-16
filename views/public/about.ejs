@@ -1,0 +1,54 @@
+<%- include('../partials/header') %>
+
+<div class="container" style="padding: 3rem 1.25rem 5rem; max-width: 860px;">
+  <%- include('../partials/breadcrumbs', { breadcrumbs }) %>
+
+  <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: #ffffff;">About CineArchive</h1>
+  <p style="font-size: 1.15rem; color: var(--primary); margin-bottom: 2rem; font-weight: 500;">
+    The 100% Legal, Automated Public Domain Cinema Platform.
+  </p>
+
+  <div style="color: #d1d5db; line-height: 1.8; font-size: 1rem; display: flex; flex-direction: column; gap: 1.5rem;">
+    <section style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.75rem;">
+      <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 0.75rem;">🎯 Our Mission</h2>
+      <p>
+        CineArchive was engineered to celebrate and safeguard the world's open cultural cinematic heritage. Before the era of restrictive digital locks, cinema blossomed with groundbreaking silent features, early sound comedies, thrilling film noir, and timeless animation.
+      </p>
+      <p style="margin-top: 0.75rem;">
+        Our goal is to make these masterpieces instantly accessible, completely free, and unambiguously legal for audiences, educators, film historians, and cinema lovers around the globe.
+      </p>
+    </section>
+
+    <section style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.75rem;">
+      <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 0.75rem;">⚖️ Strict Legal Compliance Guarantee</h2>
+      <p>
+        <strong>We have zero tolerance for copyright infringement.</strong> Every single movie featured on CineArchive undergoes an automated, rigorous legal compliance audit before it is ever published:
+      </p>
+      <ul style="margin-left: 1.5rem; margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
+        <li>✅ <strong>Public Domain:</strong> Works whose copyright has definitively expired (such as pre-1929 works or works where copyright was not renewed under pre-1978 laws).</li>
+        <li>✅ <strong>Creative Commons CC0 1.0:</strong> Worldwide public domain dedications.</li>
+        <li>✅ <strong>Creative Commons CC-BY / CC-BY-SA:</strong> Open licenses with required attribution and commercial reuse explicitly authorized.</li>
+        <li>❌ <strong>Automatic Rejection of Ambiguity:</strong> Any item with missing rights statements, "All Rights Reserved" claims, or non-commercial restrictions (CC BY-NC) is instantly rejected.</li>
+      </ul>
+    </section>
+
+    <section style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.75rem;">
+      <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 0.75rem;">🏛️ Source & Attribution: Internet Archive</h2>
+      <p>
+        All film metadata, archival scans, and streaming embeds are sourced with gratitude directly from the <strong>Internet Archive</strong> (<a href="https://archive.org" target="_blank" rel="noopener" style="color: var(--primary); text-decoration: underline;">archive.org</a>), a non-profit digital library dedicated to universal access to all knowledge.
+      </p>
+      <p style="margin-top: 0.75rem;">
+        CineArchive links directly back to each film's preservation record on the Internet Archive to ensure full provenance, attribution, and research authenticity.
+      </p>
+    </section>
+
+    <section style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.75rem;">
+      <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 0.75rem;">🤖 100% Automated, Zero Manual Intervention</h2>
+      <p>
+        CineArchive is powered by an autonomous ingestion engine. A background scheduler executes periodic scans, fetches fresh digital preservation entries, applies the strict legal license validator, normalizes metadata, generates SEO-optimized pages, and refreshes search indexes automatically.
+      </p>
+    </section>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

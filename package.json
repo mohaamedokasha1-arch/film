@@ -1,0 +1,29 @@
+{
+  "name": "cinearchive-legal-movie-platform",
+  "version": "1.0.0",
+  "description": "Fully automated, 100% legal self-updating classic movie web platform with Internet Archive integration, license validation, and SEO automation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node services/seedRunner.js",
+    "import:now": "node services/manualImport.js"
+  },
+  "keywords": [
+    "public-domain",
+    "movies",
+    "internet-archive",
+    "automated-importer",
+    "seo",
+    "legal"
+  ],
+  "author": "AI Developer",
+  "license": "MIT",
+  "dependencies": {
+    "cookie-session": "^2.1.1",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "node-cron": "^4.6.0",
+    "sql.js": "^1.14.2",
+    "sqlite3": "^6.0.1"
+  }
+}

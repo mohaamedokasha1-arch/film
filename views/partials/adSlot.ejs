@@ -1,0 +1,24 @@
+<% 
+  let isEnabled = false;
+  let code = '';
+  if (typeof position !== 'undefined' && typeof siteSettings !== 'undefined') {
+    if (position === 'header') {
+      isEnabled = siteSettings.ad_header_enabled;
+      code = siteSettings.ad_header_code;
+    } else if (position === 'sidebar') {
+      isEnabled = siteSettings.ad_sidebar_enabled;
+      code = siteSettings.ad_sidebar_code;
+    } else if (position === 'incontent') {
+      isEnabled = siteSettings.ad_incontent_enabled;
+      code = siteSettings.ad_incontent_code;
+    } else if (position === 'footer') {
+      isEnabled = siteSettings.ad_footer_enabled;
+      code = siteSettings.ad_footer_code;
+    }
+  }
+%>
+<% if (isEnabled && code) { %>
+  <div class="ad-wrapper ad-position-<%= position %>" id="ad-slot-<%= position %>">
+    <%- code %>
+  </div>
+<% } %>
