@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Social | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'settingsSocial' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Social links' }) %>
+      <main class="admin-content" style="max-width:720px;">
+        <% if (successMessage) { %><p style="color:#34d399;"><%= successMessage %></p><% } %>
+        <form method="POST" action="/admin/settings/social" style="background:var(--bg-surface);padding:1.5rem;border-radius:10px;border:1px solid var(--border-color);">
+          <% ['facebook','twitter','instagram','youtube','tiktok','telegram'].forEach(k => { %>
+            <div class="form-group">
+              <label class="form-label"><%= k %></label>
+              <input class="form-input" name="social_<%= k %>" value="<%= siteSettings['social_' + k] || '' %>">
+            </div>
+          <% }) %>
+          <button class="btn btn-primary">Save</button>
+        </form>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

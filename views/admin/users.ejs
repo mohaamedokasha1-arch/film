@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admins | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'users' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Admins & roles' }) %>
+      <main class="admin-content">
+        <% if (formError) { %><p style="color:#f87171;"><%= formError %></p><% } %>
+        <% if (successMessage) { %><p style="color:#34d399;"><%= successMessage %></p><% } %>
+        <div class="table-wrap" style="margin-bottom:1.5rem;">
+          <table class="admin-table">
+            <thead><tr><th>User</th><th>Role</th><th>Active</th><th>Last login</th><th></th></tr></thead>
+            <tbody>
+              <% users.forEach(u => { %>
+                <tr>
+                  <td><%= u.username %><div style="font-size:0.75rem;color:var(--text-dim);"><%= u.email || '' %></div></td>
+                  <td><%= u.role %></td>
+                  <td><%= u.is_active === 0 ? 'No' : 'Yes' %></td>
+                  <td><%= u.last_login || '—' %></td>
+                  <td>
+                    <form method="POST" action="/admin/users/<%= u.id %>" style="display:flex;gap:0.35rem;flex-wrap:wrap;align-items:center;">
+                      <select name="role" class="form-select" style="width:auto;">
+                        <% ['super_admin','admin','editor','moderator'].forEach(r => { %>
+                          <option value="<%= r %>" <%= u.role === r ? 'selected' : '' %>><%= r %></option>
+                        <% }) %>
+                      </select>
+                      <input class="form-input" style="width:140px;" name="email" placeholder="email" value="<%= u.email || '' %>">
+                      <input class="form-input" style="width:140px;" name="password" type="password" placeholder="new password">
+                      <label><input type="checkbox" name="is_active" <%= u.is_active !== 0 ? 'checked' : '' %>> active</label>
+                      <button class="btn btn-secondary btn-sm">Save</button>
+                    </form>
+                    <form method="POST" action="/admin/users/<%= u.id %>/delete" onsubmit="return confirm('Delete this admin?');" style="margin-top:0.35rem;">
+                      <button class="btn btn-secondary btn-sm" style="color:var(--accent-rose);">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <form method="POST" action="/admin/users" style="max-width:480px;background:var(--bg-surface);padding:1.25rem;border-radius:10px;border:1px solid var(--border-color);">
+          <h3 style="margin-bottom:0.75rem;">Add admin</h3>
+          <div class="form-group"><label class="form-label">Username</label><input class="form-input" name="username" required></div>
+          <div class="form-group"><label class="form-label">Password (min 8)</label><input class="form-input" name="password" type="password" required minlength="8"></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" name="email" type="email"></div>
+          <div class="form-group"><label class="form-label">Role</label>
+            <select class="form-select" name="role">
+              <option value="editor">editor</option>
+              <option value="admin">admin</option>
+              <option value="moderator">moderator</option>
+              <option value="super_admin">super_admin</option>
+            </select>
+          </div>
+          <button class="btn btn-primary">Create</button>
+        </form>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

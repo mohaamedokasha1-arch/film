@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trash | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'movies' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Movies Trash' }) %>
+      <main class="admin-content">
+        <a href="/admin/movies" class="btn btn-secondary btn-sm" style="margin-bottom:1rem;">← Back</a>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Title</th><th>Deleted</th><th></th></tr></thead>
+            <tbody>
+              <% if (!movies.length) { %><tr><td colspan="3">Trash is empty.</td></tr><% } %>
+              <% movies.forEach(m => { %>
+                <tr>
+                  <td><%= m.title %> (<%= m.year || 'n/a' %>)</td>
+                  <td><%= m.deleted_at %></td>
+                  <td style="text-align:right;">
+                    <form action="/admin/movies/<%= m.id %>/restore" method="POST" style="display:inline;"><button class="btn btn-secondary btn-sm">Restore</button></form>
+                    <form action="/admin/movies/<%= m.id %>/force-delete" method="POST" style="display:inline;" onsubmit="return confirm('Permanently delete?');"><button class="btn btn-secondary btn-sm" style="color:var(--accent-rose);">Delete forever</button></form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

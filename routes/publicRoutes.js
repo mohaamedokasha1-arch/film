@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { query, get, getSettingsMap } = require('../db/database');
 const SeoService = require('../services/seoService');
+const { NOT_DELETED } = require('../services/cmsHelpers');
 
 // Middleware to load siteSettings on all public requests
 router.use(async (req, res, next) => {
@@ -20,19 +21,28 @@ router.get('/', async (req, res, next) => {
     const limit = res.locals.siteSettings.items_per_page || 12;
     const offset = (page - 1) * limit;
 
-    const totalRow = await get("SELECT COUNT(*) as c FROM movies WHERE status = 'published'");
+    const totalRow = await get(`SELECT COUNT(*) as c FROM movies WHERE status = 'published' AND ${NOT_DELETED}`);
     const totalMovies = totalRow.c;
     const totalPages = Math.ceil(totalMovies / limit) || 1;
 
     const movies = await query(
-      "SELECT * FROM movies WHERE status = 'published' ORDER BY created_at DESC LIMIT ? OFFSET ?",
+      `SELECT * FROM movies WHERE status = 'published' AND ${NOT_DELETED} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
       [limit, offset]
     );
 
-    // Featured classic movie (highest view count or first prominent)
-    const featuredMovie = await get(
-      "SELECT * FROM movies WHERE status = 'published' AND poster_url IS NOT NULL ORDER BY year ASC LIMIT 1"
-    );
+    const heroMode = res.locals.siteSettings.homepage_hero_mode || 'featured';
+    let featuredMovie;
+    if (heroMode === 'latest') {
+      featuredMovie = await get(
+        `SELECT * FROM movies WHERE status = 'published' AND ${NOT_DELETED} AND poster_url IS NOT NULL ORDER BY created_at DESC LIMIT 1`
+      );
+    } else {
+      featuredMovie = await get(
+        `SELECT * FROM movies WHERE status = 'published' AND ${NOT_DELETED} AND poster_url IS NOT NULL AND featured = 1 ORDER BY sort_order ASC, year ASC LIMIT 1`
+      ) || await get(
+        `SELECT * FROM movies WHERE status = 'published' AND ${NOT_DELETED} AND poster_url IS NOT NULL ORDER BY year ASC LIMIT 1`
+      );
+    }
 
     // Active genres with counts
     const genres = await query(
@@ -72,7 +82,7 @@ router.get('/', async (req, res, next) => {
 router.get('/movie/:slug', async (req, res, next) => {
   try {
     const slug = req.params.slug;
-    const movie = await get('SELECT * FROM movies WHERE slug = ?', [slug]);
+    const movie = await get(`SELECT * FROM movies WHERE slug = ? AND ${NOT_DELETED}`, [slug]);
 
     if (!movie) {
       return res.status(404).render('public/search', {
@@ -105,7 +115,7 @@ router.get('/movie/:slug', async (req, res, next) => {
     // Related movies (same genre or nearby year)
     const relatedMovies = await query(
       `SELECT * FROM movies 
-       WHERE id != ? AND status = 'published' AND (genres LIKE ? OR year = ?) 
+       WHERE id != ? AND status = 'published' AND ${NOT_DELETED} AND (genres LIKE ? OR year = ?) 
        ORDER BY RANDOM() LIMIT 4`,
       [movie.id, `%${primaryGenre}%`, movie.year]
     );
@@ -161,7 +171,7 @@ router.get('/genre/:slug', async (req, res, next) => {
     const countRow = await get(
       `SELECT COUNT(*) as c FROM movies m
        JOIN movie_genres mg ON m.id = mg.movie_id
-       WHERE mg.genre_id = ? AND m.status = 'published'`,
+       WHERE mg.genre_id = ? AND m.status = 'published' AND (m.deleted_at IS NULL OR m.deleted_at = '')`,
       [genre.id]
     );
     const totalCount = countRow.c;
@@ -170,7 +180,7 @@ router.get('/genre/:slug', async (req, res, next) => {
     const movies = await query(
       `SELECT m.* FROM movies m
        JOIN movie_genres mg ON m.id = mg.movie_id
-       WHERE mg.genre_id = ? AND m.status = 'published'
+       WHERE mg.genre_id = ? AND m.status = 'published' AND (m.deleted_at IS NULL OR m.deleted_at = '')
        ORDER BY ${orderBy} LIMIT ? OFFSET ?`,
       [genre.id, limit, offset]
     );
@@ -215,14 +225,14 @@ router.get('/year/:year', async (req, res, next) => {
     const offset = (page - 1) * limit;
 
     const countRow = await get(
-      "SELECT COUNT(*) as c FROM movies WHERE year = ? AND status = 'published'",
+      `SELECT COUNT(*) as c FROM movies WHERE year = ? AND status = 'published' AND ${NOT_DELETED}`,
       [year]
     );
     const totalCount = countRow.c;
     const totalPages = Math.ceil(totalCount / limit) || 1;
 
     const movies = await query(
-      "SELECT * FROM movies WHERE year = ? AND status = 'published' ORDER BY title ASC LIMIT ? OFFSET ?",
+      `SELECT * FROM movies WHERE year = ? AND status = 'published' AND ${NOT_DELETED} ORDER BY title ASC LIMIT ? OFFSET ?`,
       [year, limit, offset]
     );
 
@@ -262,7 +272,7 @@ router.get('/search', async (req, res, next) => {
     const limit = res.locals.siteSettings.items_per_page || 12;
     const offset = (page - 1) * limit;
 
-    let whereClauses = ["status = 'published'"];
+    let whereClauses = ["status = 'published'", NOT_DELETED];
     let params = [];
 
     if (searchQuery) {
@@ -328,15 +338,33 @@ router.get('/search', async (req, res, next) => {
 });
 
 // 6. Static Pages: About, Contact, Privacy, Terms, Sitemap
-router.get('/about', (req, res) => {
+async function renderCmsOrDefault(req, res, slug, view, extras) {
+  const cms = await get("SELECT * FROM cms_pages WHERE slug = ? AND status = 'published'", [slug]);
   const baseUrl = `${req.protocol}://${req.get('host')}`;
-  res.render('public/about', {
-    pageTitle: `About Our Legal Mission & Archives | ${res.locals.siteSettings.site_name}`,
-    metaDescription: 'Learn about our legal compliance engine, public domain verification, and attribution to the Internet Archive.',
-    canonicalUrl: `${baseUrl}/about`,
-    breadcrumbs: [{ name: 'About', url: '/about' }],
-    activeNav: 'about'
-  });
+  if (cms && cms.content && String(cms.content).trim()) {
+    return res.render('public/cmsPage', {
+      cms,
+      pageTitle: cms.meta_title || `${cms.title} | ${res.locals.siteSettings.site_name}`,
+      metaDescription: cms.meta_description || extras.metaDescription,
+      canonicalUrl: extras.canonicalUrl || `${baseUrl}/${slug}`,
+      breadcrumbs: extras.breadcrumbs,
+      activeNav: extras.activeNav || ''
+    });
+  }
+  return res.render(view, extras);
+}
+
+router.get('/about', async (req, res, next) => {
+  try {
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    await renderCmsOrDefault(req, res, 'about', 'public/about', {
+      pageTitle: `About Our Legal Mission & Archives | ${res.locals.siteSettings.site_name}`,
+      metaDescription: 'Learn about our legal compliance engine, public domain verification, and attribution to the Internet Archive.',
+      canonicalUrl: `${baseUrl}/about`,
+      breadcrumbs: [{ name: 'About', url: '/about' }],
+      activeNav: 'about'
+    });
+  } catch (err) { next(err); }
 });
 
 router.get('/contact', (req, res) => {
@@ -356,26 +384,46 @@ router.post('/contact', (req, res) => {
   res.redirect('/contact?submitted=1');
 });
 
-router.get('/privacy-policy', (req, res) => {
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
-  res.render('public/privacy', {
-    pageTitle: `Privacy Policy | ${res.locals.siteSettings.site_name}`,
-    metaDescription: `Privacy policy and advertising cookie disclosures for ${res.locals.siteSettings.site_name}.`,
-    canonicalUrl: `${baseUrl}/privacy-policy`,
-    breadcrumbs: [{ name: 'Privacy Policy', url: '/privacy-policy' }],
-    activeNav: ''
-  });
+router.get('/p/:slug', async (req, res, next) => {
+  try {
+    const cms = await get("SELECT * FROM cms_pages WHERE slug = ? AND status = 'published'", [req.params.slug]);
+    if (!cms) return res.status(404).redirect('/');
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    res.render('public/cmsPage', {
+      cms,
+      pageTitle: cms.meta_title || `${cms.title} | ${res.locals.siteSettings.site_name}`,
+      metaDescription: cms.meta_description || '',
+      canonicalUrl: `${baseUrl}/p/${cms.slug}`,
+      breadcrumbs: [{ name: cms.title, url: `/p/${cms.slug}` }],
+      activeNav: ''
+    });
+  } catch (err) { next(err); }
 });
 
-router.get('/terms-of-service', (req, res) => {
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
-  res.render('public/terms', {
-    pageTitle: `Terms of Service | ${res.locals.siteSettings.site_name}`,
-    metaDescription: 'Terms of service and public domain cultural heritage disclaimers for AKAVOX.',
-    canonicalUrl: `${baseUrl}/terms-of-service`,
-    breadcrumbs: [{ name: 'Terms of Service', url: '/terms-of-service' }],
-    activeNav: ''
-  });
+router.get('/privacy-policy', async (req, res, next) => {
+  try {
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    await renderCmsOrDefault(req, res, 'privacy-policy', 'public/privacy', {
+      pageTitle: `Privacy Policy | ${res.locals.siteSettings.site_name}`,
+      metaDescription: `Privacy policy and advertising cookie disclosures for ${res.locals.siteSettings.site_name}.`,
+      canonicalUrl: `${baseUrl}/privacy-policy`,
+      breadcrumbs: [{ name: 'Privacy Policy', url: '/privacy-policy' }],
+      activeNav: ''
+    });
+  } catch (err) { next(err); }
+});
+
+router.get('/terms-of-service', async (req, res, next) => {
+  try {
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    await renderCmsOrDefault(req, res, 'terms-of-service', 'public/terms', {
+      pageTitle: `Terms of Service | ${res.locals.siteSettings.site_name}`,
+      metaDescription: 'Terms of service and public domain cultural heritage disclaimers for AKAVOX.',
+      canonicalUrl: `${baseUrl}/terms-of-service`,
+      breadcrumbs: [{ name: 'Terms of Service', url: '/terms-of-service' }],
+      activeNav: ''
+    });
+  } catch (err) { next(err); }
 });
 
 router.get('/sitemap', async (req, res, next) => {

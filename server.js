@@ -14,6 +14,7 @@ const movieSourceRoutes = require('./routes/movieSourceRoutes'); // NEW: multi-s
 const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
+app.set('trust proxy', 1);
 
 // View engine setup
 app.set('view engine', 'ejs');
@@ -30,8 +31,15 @@ app.use(express.json({ limit: '10mb' }));
 app.use(cookieSession({
   name: 'akavox_session',
   keys: [process.env.SESSION_SECRET || 'akavox_super_secret_key_2026'],
-  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  sameSite: 'none',
+  secure: true,
+  httpOnly: true,
+  partitioned: true
 }));
+
+const { restoreAdminSession } = require('./services/adminAuth');
+app.use(restoreAdminSession);
 
 // API Routes
 app.use('/api', apiRoutes);
@@ -108,7 +116,7 @@ async function bootstrap() {
       console.log(`🎬 AKAVOX Platform is LIVE!`);
       console.log(`🌐 Public Website : http://${HOST}:${PORT}`);
       console.log(`🔐 Admin Panel    : http://${HOST}:${PORT}/admin`);
-      console.log(`🔑 Credentials    : admin / admin123`);
+      console.log(`🔑 Credentials    : admin / (see ADMIN_PASSWORD)`);
       console.log(`📡 Ingestion Engine: Connected to Internet Archive`);
       console.log(`⏰ Scheduler       : Automated every 6h`);
       console.log(`=======================================================`);

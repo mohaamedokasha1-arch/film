@@ -119,7 +119,9 @@ movie_sources/
 ## 5. Demo video — substitute provided
 
 A video cannot be recorded inside this sandbox. Equivalent, auditable evidence provided:
-1. **Live preview** — running platform: public site + `/admin/movie-sources` (login `admin`/`admin123`)
+1. **Live preview** — running platform: public site + `/admin/movie-sources` (login `admin` / `AkavoxAdmin2026Secure`)
+
+**Source #3 (2026-09-16):** Library of Congress National Screening Room — official `fo=json` API, per-item rights gate, stream-only from `tile.loc.gov`. See `docs/SOURCE_VALIDATION_loc_national_screening_room.md`.
    with live SSE console, sources stats, logs and rejection viewers.
 2. **Automated proof** — `npm test` (27 assertions incl. license rejection & legacy-protection).
 3. **Recorded transcript** — replay output showing per-item `License VERIFIED/REJECTED` decisions

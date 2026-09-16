@@ -1,14 +1,25 @@
 const express = require('express');
+const crypto = require('crypto');
 const router = express.Router();
 const { query, get, run, getSettingsMap, setSetting, hashPassword } = require('../db/database');
 const scheduler = require('../services/scheduler');
 const movieImporter = require('../services/importer');
+const cmsAdminRoutes = require('./cmsAdminRoutes');
+const { logActivity } = require('../services/activityLog');
+const { NOT_DELETED } = require('../services/cmsHelpers');
+const { signAdminToken, passwordMatches } = require('../services/adminAuth');
+
+const loginAttempts = new Map();
 
 // Global middleware for admin routes
 router.use(async (req, res, next) => {
   res.locals.adminUser = req.session.adminUser || null;
   res.locals.siteSettings = await getSettingsMap();
   res.locals.schedulerState = scheduler.getState();
+  if (req.session && !req.session.csrfToken) {
+    req.session.csrfToken = crypto.randomBytes(16).toString('hex');
+  }
+  res.locals.csrfToken = req.session ? req.session.csrfToken : '';
   next();
 });
 
@@ -29,30 +40,38 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const hash = hashPassword(password || '');
-  const admin = await get('SELECT * FROM admins WHERE username = ? AND password_hash = ?', [username, hash]);
+  const username = String((req.body && req.body.username) || '').trim();
+  const password = String((req.body && req.body.password) || '');
+  const admin = await get('SELECT * FROM admins WHERE username = ?', [username]);
+  const ok = admin && admin.is_active !== 0 && (
+    admin.password_hash === hashPassword(password) || passwordMatches(password, hashPassword)
+  );
 
-  if (admin) {
-    req.session.adminUser = { id: admin.id, username: admin.username };
-    return res.redirect('/admin');
-  } else {
-    res.render('admin/login', { errorMessage: 'Invalid username or password' });
+  if (ok) {
+    req.session.adminUser = { id: admin.id, username: admin.username, role: admin.role || 'super_admin' };
+    await run('UPDATE admins SET last_login = CURRENT_TIMESTAMP WHERE id = ?', [admin.id]);
+    await logActivity(req, 'auth.login', 'admin', admin.id, username);
+    const token = signAdminToken(req.session.adminUser);
+    return res.redirect('/admin?t=' + encodeURIComponent(token));
   }
+  res.render('admin/login', { errorMessage: 'Invalid username or password' });
 });
 
-router.get('/logout', (req, res) => {
+router.get('/logout', async (req, res) => {
+  await logActivity(req, 'auth.logout', 'admin', req.session.adminUser && req.session.adminUser.id);
   req.session.adminUser = null;
   res.redirect('/admin/login');
 });
 
+router.use(cmsAdminRoutes);
+
 // 2. Admin Dashboard Overview
 router.get('/', requireAdmin, async (req, res, next) => {
   try {
-    const totalRow = await get('SELECT COUNT(*) as c FROM movies');
-    const publishedRow = await get("SELECT COUNT(*) as c FROM movies WHERE status = 'published'");
-    const draftRow = await get("SELECT COUNT(*) as c FROM movies WHERE status = 'draft'");
-    const new24hRow = await get("SELECT COUNT(*) as c FROM movies WHERE created_at >= datetime('now', '-1 day')");
+    const totalRow = await get(`SELECT COUNT(*) as c FROM movies WHERE ${NOT_DELETED}`);
+    const publishedRow = await get(`SELECT COUNT(*) as c FROM movies WHERE ${NOT_DELETED} AND status = 'published'`);
+    const draftRow = await get(`SELECT COUNT(*) as c FROM movies WHERE ${NOT_DELETED} AND status = 'draft'`);
+    const new24hRow = await get(`SELECT COUNT(*) as c FROM movies WHERE ${NOT_DELETED} AND created_at >= datetime('now', '-1 day')`);
 
     const totalsLog = await get(`
       SELECT 
@@ -100,7 +119,10 @@ router.get('/movies', requireAdmin, async (req, res, next) => {
     const limit = 20;
     const offset = (page - 1) * limit;
 
-    let whereClauses = [];
+    const yearFilter = req.query.year || '';
+    const featuredFilter = req.query.featured || '';
+    const sort = req.query.sort || 'created_at';
+    let whereClauses = [NOT_DELETED];
     let params = [];
 
     if (statusFilter !== 'all') {
@@ -109,32 +131,50 @@ router.get('/movies', requireAdmin, async (req, res, next) => {
     }
 
     if (searchQuery) {
-      whereClauses.push('(title LIKE ? OR director LIKE ? OR external_id LIKE ?)');
+      whereClauses.push('(title LIKE ? OR director LIKE ? OR external_id LIKE ? OR original_title LIKE ?)');
       const term = `%${searchQuery}%`;
-      params.push(term, term, term);
+      params.push(term, term, term, term);
     }
 
-    const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+    if (yearFilter) {
+      whereClauses.push('year = ?');
+      params.push(parseInt(yearFilter, 10));
+    }
+    if (featuredFilter === '1') whereClauses.push('featured = 1');
+    if (featuredFilter === 'trending') whereClauses.push('trending = 1');
+
+    const whereSql = `WHERE ${whereClauses.join(' AND ')}`;
+    const orderMap = {
+      title: 'title ASC',
+      year: 'year DESC',
+      views: 'view_count DESC',
+      created_at: 'created_at DESC'
+    };
+    const orderBy = orderMap[sort] || 'created_at DESC';
 
     const countRow = await get(`SELECT COUNT(*) as c FROM movies ${whereSql}`, params);
     const totalCount = countRow ? countRow.c : 0;
     const totalPages = Math.ceil(totalCount / limit) || 1;
 
     const movies = await query(
-      `SELECT * FROM movies ${whereSql} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      `SELECT * FROM movies ${whereSql} ORDER BY ${orderBy} LIMIT ? OFFSET ?`,
       [...params, limit, offset]
     );
 
     const counts = {
-      all: (await get('SELECT COUNT(*) as c FROM movies')).c,
-      published: (await get("SELECT COUNT(*) as c FROM movies WHERE status = 'published'")).c,
-      draft: (await get("SELECT COUNT(*) as c FROM movies WHERE status = 'draft'")).c
+      all: (await get(`SELECT COUNT(*) as c FROM movies WHERE ${NOT_DELETED}`)).c,
+      published: (await get(`SELECT COUNT(*) as c FROM movies WHERE ${NOT_DELETED} AND status = 'published'`)).c,
+      draft: (await get(`SELECT COUNT(*) as c FROM movies WHERE ${NOT_DELETED} AND status = 'draft'`)).c,
+      trash: (await get("SELECT COUNT(*) as c FROM movies WHERE deleted_at IS NOT NULL AND deleted_at != ''")).c
     };
 
     res.render('admin/movies', {
       movies,
       statusFilter,
       searchQuery,
+      yearFilter,
+      featuredFilter,
+      sort,
       currentPage: page,
       totalPages,
       counts
@@ -149,7 +189,8 @@ router.get('/movies/:id/edit', requireAdmin, async (req, res, next) => {
   try {
     const movie = await get('SELECT * FROM movies WHERE id = ?', [req.params.id]);
     if (!movie) return res.redirect('/admin/movies');
-    res.render('admin/movieEdit', { movie });
+    const genres = await query('SELECT * FROM genres ORDER BY name ASC');
+    res.render('admin/movieForm', { movie, genres, formError: null });
   } catch (err) {
     next(err);
   }
@@ -158,28 +199,29 @@ router.get('/movies/:id/edit', requireAdmin, async (req, res, next) => {
 // Edit Movie Form (POST)
 router.post('/movies/:id/edit', requireAdmin, async (req, res, next) => {
   try {
-    const { title, year, slug, description, director, duration, status, license_type, poster_url, embed_url, attribution_text } = req.body;
+    const { movieFromBody, syncMovieGenres, uniqueMovieSlug } = cmsAdminRoutes;
+    const m = movieFromBody(req.body);
+    const slug = await uniqueMovieSlug(req.body.slug || m.title, req.params.id);
     await run(
-      `UPDATE movies SET 
-        title = ?, year = ?, slug = ?, description = ?, director = ?,
-        duration = ?, status = ?, license_type = ?, poster_url = ?,
-        embed_url = ?, attribution_text = ?, updated_at = CURRENT_TIMESTAMP
+      `UPDATE movies SET
+        title=?, original_title=?, slug=?, year=?, description=?, director=?, duration=?, status=?,
+        license_type=?, license_url=?, poster_url=?, embed_url=?, video_url=?, attribution_text=?,
+        language=?, title_ar=?, country=?, rating=?, trailer_url=?, cover_url=?, writer=?, studio=?,
+        age_rating=?, tags=?, content_type=?, featured=?, trending=?, popular=?, is_new=?, coming_soon=?,
+        sort_order=?, meta_title=?, meta_description=?, meta_keywords=?, comments_enabled=?,
+        cast_members=?, genres=?, updated_at=CURRENT_TIMESTAMP
        WHERE id = ?`,
       [
-        title,
-        parseInt(year, 10) || null,
-        slug,
-        description,
-        director,
-        parseInt(duration, 10) || null,
-        status,
-        license_type,
-        poster_url,
-        embed_url,
-        attribution_text,
-        req.params.id
+        m.title, m.original_title, slug, m.year, m.description, m.director, m.duration, m.status,
+        m.license_type, m.license_url, m.poster_url, m.embed_url, m.video_url, m.attribution_text,
+        m.language, m.title_ar, m.country, m.rating, m.trailer_url, m.cover_url, m.writer, m.studio,
+        m.age_rating, JSON.stringify(m.tags), m.content_type, m.featured, m.trending, m.popular, m.is_new,
+        m.coming_soon, m.sort_order, m.meta_title, m.meta_description, m.meta_keywords, m.comments_enabled,
+        JSON.stringify(m.cast), JSON.stringify(m.genres), req.params.id
       ]
     );
+    await syncMovieGenres(req.params.id, m.genres);
+    await logActivity(req, 'movie.update', 'movie', req.params.id, m.title);
     res.redirect('/admin/movies');
   } catch (err) {
     next(err);

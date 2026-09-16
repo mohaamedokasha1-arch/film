@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Categories | AKAVOX Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <%- include('sidebar', { activePage: 'categories' }) %>
+    <div class="admin-main">
+      <%- include('topbar', { pageTitle: 'Categories' }) %>
+      <main class="admin-content">
+        <% if (successMessage) { %><p style="color:#34d399;margin-bottom:1rem;"><%= successMessage %></p><% } %>
+        <a href="/admin/categories/new" class="btn btn-primary btn-sm" style="margin-bottom:1rem;">+ Add category</a>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Name</th><th>Slug</th><th>Movies</th><th>Visible</th><th></th></tr></thead>
+            <tbody>
+              <% genres.forEach(g => { %>
+                <tr>
+                  <td><%= g.name %> <% if (g.name_ar) { %><span style="color:var(--text-dim);">(<%= g.name_ar %>)</span><% } %></td>
+                  <td><code><%= g.slug %></code></td>
+                  <td><%= g.movie_count %></td>
+                  <td><%= g.visible === 0 ? 'Hidden' : 'Visible' %></td>
+                  <td style="text-align:right;">
+                    <a class="btn btn-secondary btn-sm" href="/genre/<%= g.slug %>" target="_blank">View</a>
+                    <a class="btn btn-secondary btn-sm" href="/admin/categories/<%= g.id %>/edit">Edit</a>
+                    <form action="/admin/categories/<%= g.id %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Delete this category? Movies stay unless you choose otherwise on the edit page.');">
+                      <input type="hidden" name="mode" value="keep">
+                      <button class="btn btn-secondary btn-sm" style="color:var(--accent-rose);">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

@@ -25,6 +25,13 @@ module.exports = [
   { key: 'commons_query_offsets', value: '{}', type: 'json' },
   { key: 'source_scheduler_enabled', value: 'true', type: 'boolean' },
   { key: 'source_import_frequency_hours', value: '6', type: 'int' },
+
+  { key: 'loc_enabled', value: 'true', type: 'boolean' },
+  { key: 'loc_collections', value: 'national-screening-room', type: 'string' },
+  { key: 'loc_batch_size', value: '8', type: 'int' },
+  { key: 'loc_page', value: '1', type: 'int' },
+  { key: 'loc_min_duration_seconds', value: '20', type: 'int' },
+  { key: 'loc_rate_delay_ms', value: '700', type: 'int' },
   
   // Strict License Rules
   { key: 'license_allow_public_domain', value: 'true', type: 'boolean' },
@@ -49,5 +56,15 @@ module.exports = [
   { key: 'ad_incontent_enabled', value: 'true', type: 'boolean' },
   { key: 'ad_incontent_code', value: '<div class="ad-banner banner-incontent"><span class="ad-label">SPONSORED</span><div class="ad-box">In-Stream Content Partner (Responsive)</div></div>', type: 'string' },
   { key: 'ad_footer_enabled', value: 'true', type: 'boolean' },
-  { key: 'ad_footer_code', value: '<div class="ad-banner banner-footer"><span class="ad-label">ADVERTISEMENT</span><div class="ad-box">Footer Leaderboard (728x90)</div></div>', type: 'string' }
+  { key: 'ad_footer_code', value: '<div class="ad-banner banner-footer"><span class="ad-label">ADVERTISEMENT</span><div class="ad-box">Footer Leaderboard (728x90)</div></div>', type: 'string' },
+
+  { key: 'social_facebook', value: '', type: 'string' },
+  { key: 'social_twitter', value: '', type: 'string' },
+  { key: 'social_instagram', value: '', type: 'string' },
+  { key: 'social_youtube', value: '', type: 'string' },
+  { key: 'social_tiktok', value: '', type: 'string' },
+  { key: 'social_telegram', value: '', type: 'string' },
+  { key: 'homepage_hero_mode', value: 'featured', type: 'string' },
+  { key: 'homepage_hero_limit', value: '1', type: 'int' },
+  { key: 'maintenance_mode', value: 'false', type: 'boolean' }
 ];
